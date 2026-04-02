@@ -950,22 +950,21 @@
 
 <!-- ==================== MARKET RECAP TAB ==================== -->
 <div id="tab-recap" class="content">
-  <div class="district-strip" style="background: linear-gradient(90deg, var(--north), var(--south), var(--east));"></div>
-  <div class="section-title" style="color:#00d4ff; margin-bottom:6px;">📊 Market Recap <span class="district-badge" style="color:#00d4ff">Chicago Market</span></div>
-  <p style="color:var(--muted); font-size:0.8rem; margin-bottom:20px; font-family:'Share Tech Mono',monospace;">Chicago North + Chicago South + Chicago East combined — excludes Big South. Updates live.</p>
+  <div class="district-strip" style="background: linear-gradient(90deg, var(--north), var(--south), var(--east), var(--bigsouth));"></div>
+  <div class="section-title" style="color:#00d4ff; margin-bottom:4px;">📊 Market Recap <span class="district-badge" style="color:#00d4ff">All Districts</span></div>
 
-  <div class="divider-label">Chicago District Breakdown</div>
-
-  <!-- Per-district recap rows -->
+  <div class="divider-label">District Breakdown</div>
   <div id="recap-districts"></div>
 
-  <div class="divider-label">Total Chicago Market</div>
+  <div class="divider-label">Chicago Market Total (North + South + East)</div>
+  <div class="recap-section" style="margin-bottom:10px;">
+    <div class="recap-section-header" style="color:#00d4ff;">🌆 Chicago Market Combined</div>
+    <div class="recap-grid" id="recap-chicago-grid"></div>
+  </div>
 
-  <!-- Overall market totals -->
+  <div class="divider-label">Full Market Grand Total (All Stores)</div>
   <div class="recap-section">
-    <div class="recap-section-header" style="color:#00d4ff;">
-      🌆 Full Chicago Market — All Districts Combined
-    </div>
+    <div class="recap-section-header" style="color:var(--gold);">🌎 Grand Total — All Districts</div>
     <div class="recap-grid" id="recap-market-grid"></div>
   </div>
 </div>
@@ -1196,18 +1195,60 @@ function recapMetricHtml(label, value, status, colorClass) {
     </div>`;
 }
 
-function renderRecap() {
-  const districtsEl = document.getElementById('recap-districts');
-  const marketEl    = document.getElementById('recap-market-grid');
-  if (!districtsEl || !marketEl) return;
+function grandTotals() {
+  let traffic=0, xm=0, wt=0, rgus=0, accy=0, tchart=0;
+  ['north','south','east','bigsouth'].forEach(dk => {
+    const d = districtTotals(dk);
+    traffic += d.traffic; xm += d.xm; wt += d.wt; rgus += d.rgus; accy += d.accy; tchart += d.tchart;
+  });
+  const mcr_v    = traffic > 0 ? (xm + wt) / traffic : 0;
+  const wt_v     = traffic > 0 ? wt / traffic : 0;
+  const fcr_v    = traffic > 0 ? rgus / traffic : 0;
+  const apb_v    = xm > 0 ? accy / xm : 0;
+  const tchart_v = traffic > 0 ? tchart / traffic : 0;
+  return { traffic, xm, wt, rgus, accy, tchart, mcr: mcr_v, wtRate: wt_v, fcr: fcr_v, apb: apb_v, tchartRate: tchart_v };
+}
 
-  // Per-district breakdown
-  const distColors = { north: 'var(--north)', south: 'var(--south)', east: 'var(--east)' };
-  const distNames  = { north: 'Chicago North', south: 'Chicago South', east: 'Chicago East' };
+function recapTotalsHtml(d, accentColor) {
+  const hasT = d.traffic > 0;
+  const hasX = d.xm > 0;
+  const mS = mcrStatus(d.mcr, hasT);
+  const wS = wtStatus(d.wtRate, hasT);
+  const fS = fcrStatus(d.fcr, hasT);
+  const aS = apbStatus(d.apb, hasX);
+  const tS = tchartStatus(d.tchartRate, hasT);
+  return `
+    ${recapMetricHtml('MCR', hasT ? fmtPct(d.mcr) : '0.0%', mS, '')}
+    ${recapMetricHtml('Watch/Tab CR', hasT ? fmtPct(d.wtRate) : '0.0%', wS, '')}
+    ${recapMetricHtml('Fiscal CR', hasT ? fmtPct(d.fcr) : '0.0%', fS, '')}
+    ${recapMetricHtml('T-Chart CR', hasT ? fmtPct(d.tchartRate) : '0.0%', tS, '')}
+    ${recapMetricHtml('Accy / Box', hasX ? fmtDollar(d.apb) : '$0.00', aS, '')}
+    ${recapMetricHtml('Total XM', d.xm, '', '')}
+    ${recapMetricHtml('Watch/Tab', d.wt, '', '')}
+    ${recapMetricHtml('RGUs', d.rgus, '', '')}
+    ${recapMetricHtml('T-Charts', d.tchart, '', '')}
+    ${recapMetricHtml('Accy $', '$' + d.accy.toLocaleString(), '', '')}
+  `;
+}
+
+function renderRecap() {
+  const districtsEl  = document.getElementById('recap-districts');
+  const chicagoEl    = document.getElementById('recap-chicago-grid');
+  const marketEl     = document.getElementById('recap-market-grid');
+  if (!districtsEl || !chicagoEl || !marketEl) return;
+
+  // All 4 districts
+  const allDistricts = [
+    { key: 'north',    name: 'Chicago North', color: 'var(--north)'    },
+    { key: 'south',    name: 'Chicago South', color: 'var(--south)'    },
+    { key: 'east',     name: 'Chicago East',  color: 'var(--east)'     },
+    { key: 'bigsouth', name: 'The Big South', color: 'var(--bigsouth)' },
+  ];
+
   districtsEl.innerHTML = '';
 
-  CHICAGO_DISTRICTS.forEach(dk => {
-    const d = districtTotals(dk);
+  allDistricts.forEach(({ key, name, color }) => {
+    const d = districtTotals(key);
     const hasT = d.traffic > 0;
     const hasX = d.xm > 0;
     const mS = mcrStatus(d.mcr, hasT);
@@ -1215,51 +1256,36 @@ function renderRecap() {
     const fS = fcrStatus(d.fcr, hasT);
     const aS = apbStatus(d.apb, hasX);
     const tS = tchartStatus(d.tchartRate, hasT);
-    const c  = distColors[dk];
 
     const section = document.createElement('div');
     section.className = 'recap-section';
-    section.style.marginBottom = '16px';
+    section.style.marginBottom = '8px';
     section.innerHTML = `
-      <div class="recap-section-header" style="color:${c};">
-        ${distNames[dk]} <span style="font-size:0.75rem; opacity:0.6; font-family:'Share Tech Mono',monospace; margin-left:10px;">Traffic: ${d.traffic.toLocaleString()} &nbsp;|&nbsp; XM: ${d.xm} &nbsp;|&nbsp; Watch/Tab: ${d.wt} &nbsp;|&nbsp; RGUs: ${d.rgus} &nbsp;|&nbsp; T-Charts: ${d.tchart}</span>
+      <div class="recap-section-header" style="color:${color}; font-size:1.1rem;">
+        ${name}
+        <span style="font-size:0.7rem; opacity:0.6; font-family:'Share Tech Mono',monospace; margin-left:12px;">
+          XM: ${d.xm} &nbsp;|&nbsp; Watch/Tab: ${d.wt} &nbsp;|&nbsp; RGUs: ${d.rgus} &nbsp;|&nbsp; T-Charts: ${d.tchart} &nbsp;|&nbsp; Accy: $${d.accy.toLocaleString()}
+        </span>
       </div>
       <div class="recap-grid">
-        ${recapMetricHtml('Mobile CR', hasT ? fmtPct(d.mcr) : '0.0%', mS, c)}
-        ${recapMetricHtml('Watch/Tab CR', hasT ? fmtPct(d.wtRate) : '0.0%', wS, c)}
-        ${recapMetricHtml('Fiscal CR', hasT ? fmtPct(d.fcr) : '0.0%', fS, c)}
-        ${recapMetricHtml('T-Chart CR', hasT ? fmtPct(d.tchartRate) : '0.0%', tS, c)}
-        ${recapMetricHtml('Accy / Box', hasX ? fmtDollar(d.apb) : '$0.00', aS, c)}
-        ${recapMetricHtml('Total RGUs', d.rgus, '', c)}
-        ${recapMetricHtml('Total Traffic', d.traffic.toLocaleString(), '', c)}
+        ${recapMetricHtml('MCR', hasT ? fmtPct(d.mcr) : '0.0%', mS, color)}
+        ${recapMetricHtml('Watch/Tab CR', hasT ? fmtPct(d.wtRate) : '0.0%', wS, color)}
+        ${recapMetricHtml('Fiscal CR', hasT ? fmtPct(d.fcr) : '0.0%', fS, color)}
+        ${recapMetricHtml('T-Chart CR', hasT ? fmtPct(d.tchartRate) : '0.0%', tS, color)}
+        ${recapMetricHtml('Accy / Box', hasX ? fmtDollar(d.apb) : '$0.00', aS, color)}
+        ${recapMetricHtml('Total RGUs', d.rgus, '', color)}
       </div>
     `;
     districtsEl.appendChild(section);
   });
 
-  // Full Chicago market totals
-  const m = chicagoTotals();
-  const hasT = m.traffic > 0;
-  const hasX = m.xm > 0;
-  const mS = mcrStatus(m.mcr, hasT);
-  const wS = wtStatus(m.wtRate, hasT);
-  const fS = fcrStatus(m.fcr, hasT);
-  const aS = apbStatus(m.apb, hasX);
-  const tS = tchartStatus(m.tchartRate, hasT);
+  // Chicago combined total (North + South + East only)
+  const chi = chicagoTotals();
+  chicagoEl.innerHTML = recapTotalsHtml(chi, '#00d4ff');
 
-  marketEl.innerHTML = `
-    ${recapMetricHtml('Total Traffic', m.traffic.toLocaleString(), '', '')}
-    ${recapMetricHtml('Total XM', m.xm, '', '')}
-    ${recapMetricHtml('Total Watch/Tab', m.wt, '', '')}
-    ${recapMetricHtml('Total RGUs', m.rgus, '', '')}
-    ${recapMetricHtml('Total T-Charts', m.tchart, '', '')}
-    ${recapMetricHtml('Total Accy $', '$' + m.accy.toLocaleString(), '', '')}
-    ${recapMetricHtml('Market MCR', hasT ? fmtPct(m.mcr) : '0.0%', mS, '')}
-    ${recapMetricHtml('Market Watch/Tab CR', hasT ? fmtPct(m.wtRate) : '0.0%', wS, '')}
-    ${recapMetricHtml('Market Fiscal CR', hasT ? fmtPct(m.fcr) : '0.0%', fS, '')}
-    ${recapMetricHtml('T-Chart CR', hasT ? fmtPct(m.tchartRate) : '0.0%', tS, '')}
-    ${recapMetricHtml('Accy / Box', hasX ? fmtDollar(m.apb) : '$0.00', aS, '')}
-  `;
+  // Grand total (all 4 districts)
+  const grand = grandTotals();
+  marketEl.innerHTML = recapTotalsHtml(grand, '#ffd700');
 }
 
 // ============================================================
@@ -1341,7 +1367,6 @@ function buildDistrictTable(distKey) {
     <thead>
       <tr>
         <th>Location</th>
-        <th>Traffic</th>
         <th>XM</th>
         <th>Watch/Tab</th>
         <th>RGUs</th>
@@ -1394,7 +1419,6 @@ function storeRow(storeName, st, colorClass, distKey) {
   const nameClass = storeNameColor(storeName);
   return `
     <td class="store-name-cell ${nameClass}" id="name-${id}">${storeName}</td>
-    <td style="font-family:'Share Tech Mono',monospace; font-weight:700; font-size:1.15rem; text-align:center;">${t}</td>
     <td><input type="number" class="num-input" min="0" value="${st.xm||''}" placeholder="0"
         onchange="updateStore('${storeName}','xm',this.value,'${distKey}')"
         oninput="updateStore('${storeName}','xm',this.value,'${distKey}')"></td>
@@ -1422,7 +1446,6 @@ function districtRow(distKey) {
   const d = districtTotals(distKey);
   return `
     <td>▶ TOTAL</td>
-    <td style="font-family:'Share Tech Mono',monospace;">${d.traffic}</td>
     <td>${d.xm}</td>
     <td>${d.wt}</td>
     <td>${d.rgus}</td>
@@ -1485,13 +1508,6 @@ function refreshStoreRow(storeName) {
 function refreshDistrictTable(distKey) {
   const dist = DISTRICTS[distKey];
   dist.stores.forEach(storeName => {
-    // Update traffic display cell
-    const id = encodeId(storeName);
-    const row = document.getElementById('row-' + id);
-    if (row) {
-      const cells = row.querySelectorAll('td');
-      if (cells[1]) cells[1].textContent = state[storeName].traffic || 0;
-    }
     refreshStoreRow(storeName);
   });
   const dr = document.getElementById(distKey + '-district-row');
