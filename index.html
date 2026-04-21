@@ -6,835 +6,143 @@
 <title>BluFox Daily Shopper Track</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #060c14;
-    --surface: #0d1b2a;
-    --surface2: #112236;
-    --border: #1e3a5f;
-    --accent: #00d4ff;
-    --accent2: #ff6b00;
-    --accent3: #00ff88;
-    --gold: #ffd700;
-    --silver: #c0c0c0;
-    --bronze: #cd7f32;
-    --text: #e0f0ff;
-    --muted: #5a7a9a;
-    --danger: #ff3860;
-    --north: #00d4ff;
-    --south: #c77dff;
-    --east: #00ff88;
-    --bigsouth: #ff6b00;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: #03080f;
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    height: 100vh;
-    overflow: hidden;
-    font-size: 14px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-  }
-
-  /* Animated background grid */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Centered app shell */
-  .app-shell {
-    position: relative;
-    z-index: 1;
-    width: calc(100% - 80px);
-    max-width: 1320px;
-    margin: 8px auto;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 0 60px rgba(0,0,0,0.8), 0 0 20px rgba(0,212,255,0.06);
-    height: calc(100vh - 16px);
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Header */
-  .header {
-    position: relative;
-    z-index: 10;
-    background: linear-gradient(135deg, #060c14 0%, #0d1b2a 50%, #060c14 100%);
-    border: 1px solid var(--border);
-    border-bottom: 2px solid var(--accent);
-    border-radius: 12px 12px 0 0;
-    padding: 10px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 4px 30px rgba(0,212,255,0.2);
-  }
-
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .logo-icon {
-    width: 36px;
-    height: 36px;
-    background: linear-gradient(135deg, var(--accent), #0066ff);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px;
-    color: #fff;
-    box-shadow: 0 0 20px rgba(0,212,255,0.4);
-  }
-
-  .header h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.6rem;
-    letter-spacing: 4px;
-    background: linear-gradient(90deg, var(--accent), #fff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .header-tagline {
-    font-size: 0.7rem;
-    color: var(--muted);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-family: 'Share Tech Mono', monospace;
-  }
-
-  .live-clock {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1rem;
-    color: var(--accent);
-    text-shadow: 0 0 10px rgba(0,212,255,0.5);
-  }
-
-  /* Tab Navigation */
-  .nav {
-    position: relative;
-    z-index: 10;
-    display: flex;
-    gap: 3px;
-    padding: 6px 12px 0;
-    background: var(--surface);
-    border-left: 1px solid var(--border);
-    border-right: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-  }
-
-  .tab-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    border-bottom: none;
-    color: var(--muted);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 7px 14px;
-    cursor: pointer;
-    border-radius: 6px 6px 0 0;
-    transition: all 0.2s;
-    white-space: nowrap;
-    position: relative;
-  }
-
-  .tab-btn:hover { color: var(--text); border-color: var(--accent); }
-
-  .tab-btn.active {
-    background: var(--bg);
-    color: var(--accent);
-    border-color: var(--accent);
-    text-shadow: 0 0 8px rgba(0,212,255,0.5);
-  }
-
-  .tab-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0; right: 0;
-    height: 1px;
-    background: var(--bg);
-  }
-
-  .tab-btn[data-color="north"] { --tc: var(--north); }
-  .tab-btn[data-color="south"] { --tc: var(--south); }
-  .tab-btn[data-color="east"]  { --tc: var(--east);  }
-  .tab-btn[data-color="big"]   { --tc: var(--bigsouth); }
-  .tab-btn[data-color="traffic"] { --tc: var(--accent2); }
-  .tab-btn[data-color="recap"] { --tc: #00d4ff; }
-  .tab-btn[data-color="leaderboard"] { --tc: var(--gold); }
-
-  .tab-btn[data-color].active { color: var(--tc); border-color: var(--tc); text-shadow: 0 0 8px var(--tc); }
-
-  /* Content */
-  .content {
-    position: relative;
-    z-index: 5;
-    padding: 6px 8px 6px;
-    display: none;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-top: none;
-    border-radius: 0 0 12px 12px;
-    flex: 1;
-    overflow-y: auto;
-  }
-  .content.active { display: flex; flex-direction: column; }
-  .content > p { display: none; }
-
-  /* District color strip */
-  .district-strip {
-    height: 2px;
-    border-radius: 2px;
-    margin-bottom: 5px;
-  }
-
-  /* Store Table */
-  .section-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.1rem;
-    letter-spacing: 3px;
-    margin-bottom: 2px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .district-badge {
-    display: inline-block;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.55rem;
-    letter-spacing: 2px;
-    padding: 2px 7px;
-    border: 1px solid currentColor;
-    border-radius: 20px;
-    opacity: 0.7;
-  }
-
-  /* District header bar */
-  .dist-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 5px;
-  }
-  .dist-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.8rem;
-    letter-spacing: 3px;
-  }
-  .dist-sub {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem;
-    opacity: 0.5;
-    letter-spacing: 2px;
-    margin-left: 10px;
-  }
-
-  /* Inline stats bar */
-  .dist-stats-bar {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 8px;
-  }
-  .dsb-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 8px 6px 6px;
-    text-align: center;
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-  }
-  .dsb-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--dsb-color, var(--accent));
-  }
-  .dsb-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: block;
-    margin-bottom: 2px;
-  }
-  .dsb-value {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.7rem;
-    color: var(--dsb-color, var(--accent));
-    text-shadow: 0 0 10px var(--dsb-color, var(--accent));
-    letter-spacing: 1px;
-    line-height: 1;
-  }
-
-  .store-table-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: auto;
-  }
-
-  thead th {
-    background: var(--surface2);
-    padding: 10px 5px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.05rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-align: center;
-    border-bottom: 2px solid var(--border);
-    white-space: nowrap;
-  }
-  thead th:first-child { text-align: left; padding-left: 12px; }
-
-  tbody tr {
-    border-bottom: 1px solid rgba(30,58,95,0.6);
-    transition: background 0.12s;
-  }
-  tbody tr:hover { background: rgba(0,212,255,0.05); }
-  tbody tr:last-child { border-bottom: none; }
-
-  tbody td {
-    padding: 9px 5px;
-    text-align: center;
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 600;
-    font-size: 1.15rem;
-    white-space: nowrap;
-  }
-  tbody td:first-child {
-    text-align: left;
-    padding-left: 12px;
-    font-weight: 800;
-    font-size: 1.2rem;
-    white-space: nowrap;
-  }
-
-  /* Editable inputs */
-  .num-input {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 1.15rem;
-    font-weight: 700;
-    width: 56px;
-    text-align: center;
-    padding: 4px 2px;
-    border-radius: 4px;
-    transition: all 0.15s;
-  }
-  .num-input:focus {
-    outline: none;
-    border-color: var(--accent);
-    background: rgba(0,212,255,0.08);
-  }
-
-  /* Rate / metric cells */
-  .rate-cell {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1.05rem;
-    font-weight: 700;
-    border-radius: 5px;
-    padding: 5px 4px !important;
-  }
-  .rate-good {
-    color: #00ff88;
-    background: rgba(0,255,136,0.12);
-    box-shadow: inset 0 0 0 1px rgba(0,255,136,0.3);
-  }
-  .rate-bad {
-    color: #ff3860;
-    background: rgba(255,56,96,0.12);
-    box-shadow: inset 0 0 0 1px rgba(255,56,96,0.3);
-  }
-  .rate-zero { color: var(--muted); background: transparent; }
-
-  /* Store name color when all green or all red */
-  .store-name-cell { transition: color 0.3s; font-size: 1.2rem; font-weight: 800; }
-  .store-all-green { color: #00ff88 !important; text-shadow: 0 0 8px rgba(0,255,136,0.5); }
-  .store-all-red   { color: #ff3860 !important; text-shadow: 0 0 8px rgba(255,56,96,0.5); }
-  .store-no-data   { color: #ffd700 !important; text-shadow: 0 0 8px rgba(255,215,0,0.4); }
-
-  /* Market recap */
-  .recap-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 24px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  }
-
-  .recap-section-header {
-    background: var(--surface2);
-    padding: 14px 20px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.2rem;
-    letter-spacing: 3px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .recap-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 0;
-  }
-
-  .recap-metric {
-    padding: 18px 16px;
-    text-align: center;
-    border-right: 1px solid var(--border);
-    position: relative;
-  }
-
-  .recap-metric:last-child { border-right: none; }
-
-  .recap-metric::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--rm-color, var(--accent));
-  }
-
-  .recap-metric-label {
-    font-size: 0.72rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    font-family: 'Share Tech Mono', monospace;
-    margin-bottom: 8px;
-  }
-
-  .recap-metric-value {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2.2rem;
-    letter-spacing: 2px;
-    color: var(--rm-color, var(--accent));
-    text-shadow: 0 0 10px var(--rm-color, var(--accent));
-  }
-
-  .recap-metric-good  { --rm-color: #00ff88; }
-  .recap-metric-bad   { --rm-color: #ff3860; }
-  .recap-metric-neutral { --rm-color: var(--accent); }
-
-  /* District totals row */
-  .district-row td {
-    background: var(--surface2);
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    border-top: 2px solid var(--border);
-    color: var(--accent);
-    padding: 8px 5px;
-  }
-  .district-row td:first-child {
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-size: 0.9rem;
-    padding-left: 12px;
-    font-family: 'Share Tech Mono', monospace;
-  }
-
-  /* Stat cards row */
-  .stat-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 6px;
-    margin-bottom: 8px;
-  }
-
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px 10px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--card-color, var(--accent));
-  }
-
-  .stat-label {
-    font-size: 0.55rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--muted);
-    font-family: 'Share Tech Mono', monospace;
-    margin-bottom: 3px;
-  }
-
-  .stat-value {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.4rem;
-    letter-spacing: 1px;
-    color: var(--card-color, var(--accent));
-    text-shadow: 0 0 10px var(--card-color, var(--accent));
-  }
-
-  /* Traffic page */
-  .traffic-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 7px;
-  }
-
-  .store-traffic-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 8px 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: border-color 0.2s;
-  }
-
-  .store-traffic-card:hover { border-color: var(--accent); }
-
-  .store-name-label {
-    font-weight: 700;
-    font-size: 0.82rem;
-    margin-bottom: 1px;
-  }
-
-  .store-district-label {
-    font-size: 0.6rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--muted);
-    font-family: 'Share Tech Mono', monospace;
-  }
-
-  .traffic-input {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.3rem;
-    width: 72px;
-    text-align: center;
-    padding: 4px 6px;
-    border-radius: 6px;
-    letter-spacing: 2px;
-    transition: all 0.2s;
-  }
-
-  .traffic-input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 12px rgba(0,212,255,0.25);
-    background: rgba(0,212,255,0.05);
-  }
-
-  .traffic-total-bar {
-    background: var(--surface);
-    border: 1px solid var(--accent);
-    border-radius: 8px;
-    padding: 10px 20px;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 0 20px rgba(0,212,255,0.1);
-  }
-
-  .traffic-total-bar .big-num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 2rem;
-    color: var(--accent);
-    text-shadow: 0 0 20px rgba(0,212,255,0.6);
-    letter-spacing: 3px;
-  }
-
-  /* Paste box */
-  .paste-section {
-    background: var(--surface);
-    border: 1px dashed var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    margin-bottom: 10px;
-  }
-
-  .paste-section h3 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 0.9rem;
-    letter-spacing: 2px;
-    color: var(--accent);
-    margin-bottom: 4px;
-  }
-
-  .paste-section p {
-    font-size: 0.65rem;
-    color: var(--muted);
-    margin-bottom: 6px;
-    font-family: 'Share Tech Mono', monospace;
-  }
-
-  .paste-textarea {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem;
-    padding: 6px 8px;
-    resize: vertical;
-    min-height: 52px;
-    transition: border-color 0.2s;
-  }
-
-  .paste-textarea:focus { outline: none; border-color: var(--accent); }
-
-  /* Buttons */
-  .btn {
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 700;
-    font-size: 0.7rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 6px 14px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent), #0066ff);
-    color: #fff;
-    box-shadow: 0 4px 15px rgba(0,212,255,0.3);
-  }
-
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,212,255,0.5); }
-
-  .btn-danger {
-    background: linear-gradient(135deg, var(--danger), #cc0033);
-    color: #fff;
-    box-shadow: 0 4px 15px rgba(255,56,96,0.3);
-  }
-
-  .btn-danger:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,56,96,0.5); }
-
-  .btn-success {
-    background: linear-gradient(135deg, var(--accent3), #00aa55);
-    color: #000;
-    box-shadow: 0 4px 15px rgba(0,255,136,0.3);
-  }
-
-  .btn-success:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,255,136,0.5); }
-
-  .btn-row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 8px;
-  }
-
-  /* Leaderboard */
-  .leaderboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-  }
-
-  .leaderboard-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  }
-
-  .lb-header {
-    padding: 14px 20px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.1rem;
-    letter-spacing: 3px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .lb-icon { font-size: 1.2rem; }
-
-  .lb-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 20px;
-    border-bottom: 1px solid rgba(30,58,95,0.4);
-    transition: background 0.15s;
-  }
-
-  .lb-row:hover { background: rgba(0,212,255,0.03); }
-  .lb-row:last-child { border-bottom: none; }
-
-  .lb-rank {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.6rem;
-    width: 36px;
-    text-align: center;
-    flex-shrink: 0;
-  }
-
-  .lb-rank.gold   { color: var(--gold);   text-shadow: 0 0 10px rgba(255,215,0,0.6); }
-  .lb-rank.silver { color: var(--silver); text-shadow: 0 0 10px rgba(192,192,192,0.5); }
-  .lb-rank.bronze { color: var(--bronze); text-shadow: 0 0 10px rgba(205,127,50,0.5); }
-
-  .lb-info { flex: 1; min-width: 0; }
-  .lb-store-name { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .lb-district { font-size: 0.65rem; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; font-family: 'Share Tech Mono', monospace; }
-
-  .lb-value {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.4rem;
-    letter-spacing: 1px;
-    text-align: right;
-  }
-
-  .lb-bar-wrap { height: 3px; background: rgba(30,58,95,0.6); border-radius: 2px; margin-top: 4px; }
-  .lb-bar { height: 3px; border-radius: 2px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
-
-  /* District color accents */
-  .color-north { color: var(--north); }
-  .color-south { color: var(--south); }
-  .color-east  { color: var(--east);  }
-  .color-big   { color: var(--bigsouth); }
-
-  .bg-north { background: var(--north); }
-  .bg-south { background: var(--south); }
-  .bg-east  { background: var(--east);  }
-  .bg-big   { background: var(--bigsouth); }
-
-  /* Divider section */
-  .divider-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 8px 0 6px;
-    color: var(--muted);
-    font-size: 0.6rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-family: 'Share Tech Mono', monospace;
-  }
-
-  .divider-label::before, .divider-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* Pulse animation on live */
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  .live-dot {
-    display: inline-block;
-    width: 8px; height: 8px;
-    background: var(--accent3);
-    border-radius: 50%;
-    animation: pulse 1.5s infinite;
-    margin-right: 6px;
-    box-shadow: 0 0 6px var(--accent3);
-  }
-
-  /* Toast */
-  .toast {
-    position: fixed;
-    bottom: 24px; right: 24px;
-    background: var(--surface2);
-    border: 1px solid var(--accent);
-    border-radius: 8px;
-    padding: 14px 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--accent);
-    z-index: 9999;
-    transform: translateY(100px);
-    opacity: 0;
-    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-    max-width: 300px;
-    box-shadow: 0 8px 30px rgba(0,212,255,0.2);
-  }
-
-  .toast.show { transform: translateY(0); opacity: 1; }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    .header { flex-direction: column; gap: 10px; text-align: center; }
-    .stat-cards { grid-template-columns: 1fr 1fr; }
-  }
+:root {
+  --bg:#060c14; --surface:#0d1b2a; --surface2:#112236; --border:#1e3a5f;
+  --accent:#00d4ff; --accent2:#ff6b00; --accent3:#00ff88;
+  --gold:#ffd700; --silver:#c0c0c0; --bronze:#cd7f32;
+  --text:#e0f0ff; --muted:#5a7a9a; --danger:#ff3860;
+  --north:#00d4ff; --south:#c77dff; --east:#00ff88; --bigsouth:#ff6b00;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#03080f;color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;display:flex;justify-content:center;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+.app-shell{position:relative;z-index:1;width:calc(100% - 80px);max-width:1320px;margin:8px auto;border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,0.8);min-height:calc(100vh - 16px);display:flex;flex-direction:column;}
+/* Header */
+.header{background:linear-gradient(135deg,#060c14 0%,#0d1b2a 50%,#060c14 100%);border-bottom:2px solid var(--accent);padding:10px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 30px rgba(0,212,255,0.2);}
+.header-left{display:flex;align-items:center;gap:12px;}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),#0066ff);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:#fff;box-shadow:0 0 20px rgba(0,212,255,0.4);}
+.header h1{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:4px;background:linear-gradient(90deg,var(--accent),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.header-tagline{font-size:0.7rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+.live-clock{font-family:'Share Tech Mono',monospace;font-size:1rem;color:var(--accent);text-shadow:0 0 10px rgba(0,212,255,0.5);}
+/* Nav */
+.nav{display:flex;gap:3px;padding:6px 12px 0;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;}
+.tab-btn{background:transparent;border:1px solid var(--border);border-bottom:none;color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:0.75rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:7px 14px;cursor:pointer;border-radius:6px 6px 0 0;transition:all 0.2s;white-space:nowrap;position:relative;}
+.tab-btn:hover{color:var(--text);border-color:var(--accent);}
+.tab-btn.active{background:var(--bg);color:var(--tc,var(--accent));border-color:var(--tc,var(--accent));text-shadow:0 0 8px var(--tc,var(--accent));}
+.tab-btn.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:var(--bg);}
+.tab-btn[data-color="traffic"]{--tc:var(--accent2);}
+.tab-btn[data-color="north"]{--tc:var(--north);}
+.tab-btn[data-color="south"]{--tc:var(--south);}
+.tab-btn[data-color="east"]{--tc:var(--east);}
+.tab-btn[data-color="big"]{--tc:var(--bigsouth);}
+.tab-btn[data-color="recap"]{--tc:var(--accent);}
+.tab-btn[data-color="leaderboard"]{--tc:var(--gold);}
+/* Content */
+.content{padding:8px 10px;display:none;background:var(--bg);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;flex:1;overflow-y:auto;}
+.content.active{display:block;}
+/* District strip */
+.district-strip{height:3px;border-radius:2px;margin-bottom:6px;}
+/* Section title */
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:3px;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.district-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:0.6rem;letter-spacing:2px;padding:2px 8px;border:1px solid currentColor;border-radius:20px;opacity:0.7;}
+/* Dist header */
+.dist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.dist-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;}
+.dist-sub{font-family:'Share Tech Mono',monospace;font-size:0.6rem;opacity:0.5;letter-spacing:2px;margin-left:8px;}
+/* Stats cards */
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px;margin-bottom:8px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;text-align:center;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--card-color,var(--accent));}
+.stat-label{font-size:0.55rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-family:'Share Tech Mono',monospace;margin-bottom:3px;}
+.stat-value{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px;color:var(--card-color,var(--accent));text-shadow:0 0 10px var(--card-color,var(--accent));}
+/* Store table */
+.store-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:8px;}
+table{width:100%;border-collapse:collapse;table-layout:auto;}
+thead th{background:var(--surface2);padding:10px 8px;font-family:'Share Tech Mono',monospace;font-size:0.8rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);text-align:center;border-bottom:1px solid var(--border);white-space:nowrap;}
+thead th:first-child{text-align:left;padding-left:14px;}
+tbody tr{border-bottom:1px solid rgba(30,58,95,0.5);transition:background 0.15s;}
+tbody tr:hover{background:rgba(0,212,255,0.04);}
+tbody td{padding:10px 8px;text-align:center;font-weight:500;font-size:1rem;}
+tbody td:first-child{text-align:left;padding-left:14px;font-weight:700;font-size:1.05rem;}
+.num-input{background:transparent;border:1px solid transparent;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:600;width:72px;text-align:center;padding:5px 4px;border-radius:4px;transition:all 0.2s;}
+.num-input:focus{outline:none;border-color:var(--accent);background:rgba(0,212,255,0.07);}
+.rate-cell{font-family:'Share Tech Mono',monospace;font-size:0.95rem;font-weight:700;border-radius:5px;padding:6px 8px !important;}
+.rate-good{color:#00ff88;background:rgba(0,255,136,0.1);box-shadow:inset 0 0 0 1px rgba(0,255,136,0.3);}
+.rate-bad{color:#ff3860;background:rgba(255,56,96,0.1);box-shadow:inset 0 0 0 1px rgba(255,56,96,0.3);}
+.rate-zero{color:var(--muted);}
+.store-name-cell{transition:color 0.3s;font-size:1.05rem;}
+.store-all-green{color:#00ff88 !important;text-shadow:0 0 8px rgba(0,255,136,0.5);font-weight:800;}
+.store-all-red{color:#ff3860 !important;text-shadow:0 0 8px rgba(255,56,96,0.5);font-weight:800;}
+.store-no-data{color:#ffd700 !important;text-shadow:0 0 8px rgba(255,215,0,0.4);}
+.district-row td{background:var(--surface2);font-family:'Share Tech Mono',monospace;font-size:0.8rem;font-weight:700;border-top:2px solid var(--border);color:var(--accent);}
+.district-row td:first-child{text-transform:uppercase;letter-spacing:2px;font-size:0.75rem;}
+/* Traffic */
+.traffic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:7px;}
+.store-traffic-card{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;}
+.store-traffic-card:hover{border-color:var(--accent);}
+.store-name-label{font-weight:700;font-size:0.82rem;margin-bottom:1px;}
+.store-district-label{font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-family:'Share Tech Mono',monospace;}
+.traffic-input{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:1.3rem;width:72px;text-align:center;padding:4px 6px;border-radius:6px;letter-spacing:2px;transition:all 0.2s;}
+.traffic-input:focus{outline:none;border-color:var(--accent);background:rgba(0,212,255,0.05);}
+.traffic-total-bar{background:var(--surface);border:1px solid var(--accent);border-radius:8px;padding:10px 20px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.traffic-total-bar .big-num{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--accent);text-shadow:0 0 20px rgba(0,212,255,0.6);letter-spacing:3px;}
+/* Paste */
+.paste-section{background:var(--surface);border:1px dashed var(--border);border-radius:8px;padding:10px 14px;margin-bottom:10px;}
+.paste-section h3{font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:2px;color:var(--accent);margin-bottom:4px;}
+.paste-section p{font-size:0.65rem;color:var(--muted);margin-bottom:6px;font-family:'Share Tech Mono',monospace;}
+.paste-textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.65rem;padding:6px 8px;resize:vertical;min-height:52px;transition:border-color 0.2s;}
+.paste-textarea:focus{outline:none;border-color:var(--accent);}
+/* Buttons */
+.btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:0.7rem;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;border:none;border-radius:5px;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:5px;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#0066ff);color:#fff;}
+.btn-danger{background:linear-gradient(135deg,var(--danger),#cc0033);color:#fff;}
+.btn-success{background:linear-gradient(135deg,var(--accent3),#00aa55);color:#000;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+/* Divider */
+.divider-label{display:flex;align-items:center;gap:8px;margin:10px 0 6px;color:var(--muted);font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+.divider-label::before,.divider-label::after{content:'';flex:1;height:1px;background:var(--border);}
+/* Market Recap */
+.recap-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;}
+.recap-header{background:var(--surface2);padding:11px 16px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.recap-header .sub{font-family:'Share Tech Mono',monospace;font-size:0.58rem;opacity:0.5;letter-spacing:1px;font-weight:400;margin-left:4px;}
+.recap-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));}
+.recap-row+.recap-row{border-top:1px solid var(--border);}
+.recap-metric{padding:12px 8px;text-align:center;border-right:1px solid var(--border);position:relative;}
+.recap-metric:last-child{border-right:none;}
+.recap-metric::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--rm,var(--accent));}
+.rm-label{font-family:'Share Tech Mono',monospace;font-size:0.56rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.rm-value{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:1px;color:var(--rm,var(--accent));text-shadow:0 0 10px var(--rm,var(--accent));line-height:1;}
+.rm-value.sm{font-size:1.3rem;}
+.rm-green{--rm:#00ff88;} .rm-red{--rm:#ff3860;} .rm-neu{--rm:var(--accent);}
+.rm-north{--rm:var(--north);} .rm-south{--rm:var(--south);} .rm-east{--rm:var(--east);} .rm-big{--rm:var(--bigsouth);}
+/* Leaderboard */
+.leaderboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+.leaderboard-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.lb-header{padding:12px 18px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.lb-row{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid rgba(30,58,95,0.4);}
+.lb-row:last-child{border-bottom:none;}
+.lb-rank{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;width:32px;text-align:center;flex-shrink:0;}
+.lb-rank.gold{color:var(--gold);} .lb-rank.silver{color:var(--silver);} .lb-rank.bronze{color:var(--bronze);}
+.lb-info{flex:1;min-width:0;}
+.lb-store-name{font-weight:700;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb-district{font-size:0.65rem;letter-spacing:1px;color:var(--muted);text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+.lb-bar-wrap{height:3px;background:rgba(30,58,95,0.6);border-radius:2px;margin-top:4px;}
+.lb-bar{height:3px;border-radius:2px;}
+.lb-value{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px;text-align:right;}
+.color-north{color:var(--north);} .color-south{color:var(--south);} .color-east{color:var(--east);} .color-big{color:var(--bigsouth);}
+.bg-north{background:var(--north);} .bg-south{background:var(--south);} .bg-east{background:var(--east);} .bg-big{background:var(--bigsouth);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+.live-dot{display:inline-block;width:8px;height:8px;background:var(--accent3);border-radius:50%;animation:pulse 1.5s infinite;margin-right:6px;box-shadow:0 0 6px var(--accent3);}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--accent);border-radius:8px;padding:12px 18px;font-size:0.85rem;font-weight:600;color:var(--accent);z-index:9999;transform:translateY(100px);opacity:0;transition:all 0.3s;max-width:300px;}
+.toast.show{transform:translateY(0);opacity:1;}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 </style>
 </head>
 <body>
-
 <div class="app-shell">
 
-<!-- Header -->
 <header class="header">
   <div class="header-left">
     <div class="logo-icon">BF</div>
@@ -846,7 +154,6 @@
   <div class="live-clock" id="clock">--:-- --</div>
 </header>
 
-<!-- Navigation -->
 <nav class="nav">
   <button class="tab-btn active" data-tab="traffic" data-color="traffic" onclick="switchTab('traffic')">🚦 Traffic</button>
   <button class="tab-btn" data-tab="north" data-color="north" onclick="switchTab('north')">🔵 Chicago North</button>
@@ -857,925 +164,469 @@
   <button class="tab-btn" data-tab="leaderboard" data-color="leaderboard" onclick="switchTab('leaderboard')">🏆 Leaderboard</button>
 </nav>
 
-<!-- ==================== TRAFFIC TAB ==================== -->
+<!-- TRAFFIC TAB -->
 <div id="tab-traffic" class="content active">
-  <div class="district-strip" style="background: linear-gradient(90deg, var(--accent), var(--accent2));"></div>
-
+  <div class="district-strip" style="background:linear-gradient(90deg,var(--accent),var(--accent2));"></div>
   <div class="traffic-total-bar">
     <div>
       <div class="stat-label">Total Market Traffic</div>
       <div class="big-num" id="total-traffic-display">0</div>
     </div>
-    <div style="display:flex; gap:24px; flex-wrap:wrap;">
-      <div style="text-align:center">
-        <div class="stat-label" style="color:var(--north)">Chi North</div>
-        <div style="font-family:'Bebas Neue',sans-serif; font-size:1.6rem; color:var(--north);" id="tot-north">0</div>
-      </div>
-      <div style="text-align:center">
-        <div class="stat-label" style="color:var(--south)">Chi South</div>
-        <div style="font-family:'Bebas Neue',sans-serif; font-size:1.6rem; color:var(--south);" id="tot-south">0</div>
-      </div>
-      <div style="text-align:center">
-        <div class="stat-label" style="color:var(--east)">Chi East</div>
-        <div style="font-family:'Bebas Neue',sans-serif; font-size:1.6rem; color:var(--east);" id="tot-east">0</div>
-      </div>
-      <div style="text-align:center">
-        <div class="stat-label" style="color:var(--bigsouth)">Big South</div>
-        <div style="font-family:'Bebas Neue',sans-serif; font-size:1.6rem; color:var(--bigsouth);" id="tot-big">0</div>
-      </div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap;">
+      <div style="text-align:center"><div class="stat-label" style="color:var(--north)">Chi North</div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--north);" id="tot-north">0</div></div>
+      <div style="text-align:center"><div class="stat-label" style="color:var(--south)">Chi South</div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--south);" id="tot-south">0</div></div>
+      <div style="text-align:center"><div class="stat-label" style="color:var(--east)">Chi East</div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--east);" id="tot-east">0</div></div>
+      <div style="text-align:center"><div class="stat-label" style="color:var(--bigsouth)">Big South</div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--bigsouth);" id="tot-big">0</div></div>
     </div>
   </div>
-
   <div class="paste-section">
     <h3>⚡ Quick Paste Traffic</h3>
-    <p>Copy your full traffic report and paste it here — store numbers are matched automatically. The "Average" row is ignored.</p>
-    <textarea class="paste-textarea" id="paste-area" placeholder="51017 - CC - Comcast Cable - Hammond Hil&#9;15:30&#9;53&#10;55000 - Xfinity Valparaiso&#9;14:30&#9;75&#10;Average&#9;&#9;48"></textarea>
+    <p>Paste your full traffic report — store IDs matched automatically. "Average" row ignored.</p>
+    <textarea class="paste-textarea" id="paste-area" placeholder="51017 - CC - Comcast Cable - Hammond&#9;15:30&#9;53&#10;55000 - Xfinity Valparaiso&#9;14:30&#9;75&#10;Average&#9;&#9;48"></textarea>
     <div class="btn-row">
-      <button class="btn btn-success" onclick="importPaste()">⚡ Import Paste</button>
-      <button class="btn btn-danger" onclick="confirmReset()">🔄 Reset All to Zero</button>
+      <button class="btn btn-success" onclick="importPaste()">⚡ Import Traffic</button>
+      <button class="btn btn-danger" onclick="resetAll()">🔄 Reset All</button>
     </div>
   </div>
-
   <div class="divider-label">Individual Store Traffic</div>
   <div class="traffic-grid" id="traffic-grid"></div>
 </div>
 
-<!-- ==================== CHICAGO NORTH TAB ==================== -->
+<!-- CHICAGO NORTH TAB -->
 <div id="tab-north" class="content">
+  <div class="district-strip" style="background:var(--north);"></div>
   <div class="dist-header">
-    <div class="dist-title color-north">🔵 CHICAGO NORTH <span class="dist-sub">District 257</span></div>
-    <button class="btn btn-danger" onclick="confirmResetDistrict('north')">🔄 Reset</button>
+    <div class="dist-title color-north">🔵 Chicago North <span class="dist-sub">District 257</span></div>
+    <button class="btn btn-danger" onclick="resetDistrict('north')">🔄 Reset</button>
   </div>
-  <div class="dist-stats-bar" id="north-stats-bar"></div>
-  <div class="store-table-wrap">
-    <table id="north-table"></table>
-  </div>
+  <div class="stat-cards" id="north-stats"></div>
+  <div class="store-table-wrap"><table id="north-table"></table></div>
 </div>
 
-<!-- ==================== CHICAGO SOUTH TAB ==================== -->
+<!-- CHICAGO SOUTH TAB -->
 <div id="tab-south" class="content">
+  <div class="district-strip" style="background:var(--south);"></div>
   <div class="dist-header">
-    <div class="dist-title color-south">🟣 CHICAGO SOUTH <span class="dist-sub">District 290</span></div>
-    <button class="btn btn-danger" onclick="confirmResetDistrict('south')">🔄 Reset</button>
+    <div class="dist-title color-south">🟣 Chicago South <span class="dist-sub">District 290</span></div>
+    <button class="btn btn-danger" onclick="resetDistrict('south')">🔄 Reset</button>
   </div>
-  <div class="dist-stats-bar" id="south-stats-bar"></div>
-  <div class="store-table-wrap">
-    <table id="south-table"></table>
-  </div>
+  <div class="stat-cards" id="south-stats"></div>
+  <div class="store-table-wrap"><table id="south-table"></table></div>
 </div>
 
-<!-- ==================== CHICAGO EAST TAB ==================== -->
+<!-- CHICAGO EAST TAB -->
 <div id="tab-east" class="content">
+  <div class="district-strip" style="background:var(--east);"></div>
   <div class="dist-header">
-    <div class="dist-title color-east">🟢 CHICAGO EAST <span class="dist-sub">District 256</span></div>
-    <button class="btn btn-danger" onclick="confirmResetDistrict('east')">🔄 Reset</button>
+    <div class="dist-title color-east">🟢 Chicago East <span class="dist-sub">District 256</span></div>
+    <button class="btn btn-danger" onclick="resetDistrict('east')">🔄 Reset</button>
   </div>
-  <div class="dist-stats-bar" id="east-stats-bar"></div>
-  <div class="store-table-wrap">
-    <table id="east-table"></table>
-  </div>
+  <div class="stat-cards" id="east-stats"></div>
+  <div class="store-table-wrap"><table id="east-table"></table></div>
 </div>
 
-<!-- ==================== BIG SOUTH TAB ==================== -->
+<!-- BIG SOUTH TAB -->
 <div id="tab-bigsouth" class="content">
+  <div class="district-strip" style="background:var(--bigsouth);"></div>
   <div class="dist-header">
-    <div class="dist-title color-big">🟠 THE BIG SOUTH <span class="dist-sub">District 316</span></div>
-    <button class="btn btn-danger" onclick="confirmResetDistrict('bigsouth')">🔄 Reset</button>
+    <div class="dist-title color-big">🟠 The Big South <span class="dist-sub">District 316</span></div>
+    <button class="btn btn-danger" onclick="resetDistrict('bigsouth')">🔄 Reset</button>
   </div>
-  <div class="dist-stats-bar" id="bigsouth-stats-bar"></div>
-  <div class="store-table-wrap">
-    <table id="bigsouth-table"></table>
-  </div>
+  <div class="stat-cards" id="bigsouth-stats"></div>
+  <div class="store-table-wrap"><table id="bigsouth-table"></table></div>
 </div>
 
-<!-- ==================== MARKET RECAP TAB ==================== -->
+<!-- MARKET RECAP TAB -->
 <div id="tab-recap" class="content">
-  <div class="district-strip" style="background: linear-gradient(90deg, var(--north), var(--south), var(--east), var(--bigsouth));"></div>
-  <div class="section-title" style="color:#00d4ff; margin-bottom:4px;">📊 Market Recap <span class="district-badge" style="color:#00d4ff">All Districts</span></div>
-
-  <div class="divider-label">District Breakdown</div>
+  <div class="district-strip" style="background:linear-gradient(90deg,var(--north),var(--south),var(--east),var(--bigsouth));"></div>
+  <div class="section-title" style="color:var(--accent);margin-bottom:8px;">📊 Market Recap <span class="district-badge" style="color:var(--accent)">Live Totals</span></div>
+  <div class="divider-label">Individual Districts</div>
   <div id="recap-districts"></div>
-
   <div class="divider-label">Chicago Market Total (North + South + East)</div>
-  <div class="recap-section" style="margin-bottom:10px;">
-    <div class="recap-section-header" style="color:#00d4ff;">🌆 Chicago Market Combined</div>
-    <div class="recap-grid" id="recap-chicago-grid"></div>
-  </div>
-
-  <div class="divider-label">Full Market Grand Total (All Stores)</div>
-  <div class="recap-section">
-    <div class="recap-section-header" style="color:var(--gold);">🌎 Grand Total — All Districts</div>
-    <div class="recap-grid" id="recap-market-grid"></div>
-  </div>
+  <div id="recap-chicago"></div>
+  <div class="divider-label">Full Region Grand Total — All 4 Districts</div>
+  <div id="recap-region"></div>
 </div>
 
-<!-- ==================== LEADERBOARD TAB ==================== -->
+<!-- LEADERBOARD TAB -->
 <div id="tab-leaderboard" class="content">
-  <div class="district-strip" style="background: linear-gradient(90deg, var(--gold), var(--accent2));"></div>
-  <div class="section-title" style="color: var(--gold);">🏆 Live Leaderboard <span class="district-badge" style="color:var(--gold)">Running Totals</span></div>
-  <p style="color:var(--muted); font-size:0.8rem; margin-bottom:20px; font-family:'Share Tech Mono',monospace;">Top performers across all districts — updates live as you enter data.</p>
+  <div class="district-strip" style="background:linear-gradient(90deg,var(--gold),var(--accent2));"></div>
+  <div class="section-title" style="color:var(--gold);margin-bottom:8px;">🏆 Leaderboard <span class="district-badge" style="color:var(--gold)">Running Totals</span></div>
   <div class="leaderboard-grid" id="leaderboard-grid"></div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
-
-</div><!-- end app-shell -->
+</div>
 
 <script>
 // ============================================================
-// DATA MODEL
+// DATA
 // ============================================================
-
 const DISTRICTS = {
-  north: {
-    label: 'Chicago North',
-    color: 'north',
-    stores: ['Evanston','Glenview','Kildeer','Uptown','South Skokie','Round Lake Beach']
-  },
-  south: {
-    label: 'Chicago South',
-    color: 'south',
-    stores: ['Evergreen Park','Tinley Park','Frankfort','Bourbonnais','Dekalb','Burbank']
-  },
-  east: {
-    label: 'Chicago East',
-    color: 'east',
-    stores: ['Cicero','Hammond','Valparaiso','Elkhart','South Bend','Schererville','Michigan City']
-  },
-  bigsouth: {
-    label: 'Big South',
-    color: 'big',
-    stores: ['Oak Ridge','Greeneville','South Knoxville','Johnson City']
-  }
+  north:    {label:'Chicago North', color:'north',    stores:['Evanston','Glenview','Kildeer','Uptown','South Skokie','Round Lake Beach']},
+  south:    {label:'Chicago South', color:'south',    stores:['Evergreen Park','Tinley Park','Frankfort','Bourbonnais','Dekalb','Burbank']},
+  east:     {label:'Chicago East',  color:'east',     stores:['Cicero','Hammond','Valparaiso','Elkhart','South Bend','Schererville','Michigan City']},
+  bigsouth: {label:'Big South',     color:'big',      stores:['Oak Ridge','Greeneville','South Knoxville','Johnson City']}
+};
+const ALL_STORES = [];
+Object.entries(DISTRICTS).forEach(([dk,d])=>d.stores.forEach(s=>ALL_STORES.push({name:s,district:dk})));
+
+const STORE_ID_MAP = {
+  '51009':'Oak Ridge','51011':'Greeneville','51017':'Hammond','51022':'South Knoxville',
+  '51023':'Round Lake Beach','51025':'South Skokie','51026':'Schererville','51031':'Johnson City',
+  '51032':'Burbank','51033':'Michigan City','51035':'South Bend','55000':'Valparaiso',
+  '55001':'Kildeer','55002':'Tinley Park','55003':'Dekalb','55004':'Glenview',
+  '55005':'Frankfort','55006':'Elkhart','55008':'Evanston','55009':'Uptown',
+  '55010':'Evergreen Park','55011':'Cicero','55027':'Bourbonnais'
 };
 
-const ALL_STORES = [];
-Object.entries(DISTRICTS).forEach(([distKey, dist]) => {
-  dist.stores.forEach(s => ALL_STORES.push({ name: s, district: distKey }));
-});
-
-// State: { storeName: { traffic, xm, wt, rgus, accy } }
 let state = {};
 
+function blankStore() { return {traffic:0,xm:0,wt:0,rgus:0,accy:0,tchart:0}; }
+
 function initState() {
-  const saved = localStorage.getItem('blufox_state');
-  if (saved) {
-    try { state = JSON.parse(saved); } catch(e) { state = {}; }
-  }
+  try { const s=localStorage.getItem('blufox_daily'); if(s) state=JSON.parse(s); } catch(e){}
   ALL_STORES.forEach(s => {
-    if (!state[s.name]) state[s.name] = { traffic: 0, xm: 0, wt: 0, rgus: 0, accy: 0, tchart: 0 };
-    if (state[s.name].tchart === undefined) state[s.name].tchart = 0;
+    if (!state[s.name]) state[s.name] = blankStore();
+    // migrate old saves that might be missing fields
+    const st = state[s.name];
+    if (st.tchart===undefined) st.tchart=0;
+    if (st.traffic===undefined) st.traffic=0;
   });
 }
-
-function saveState() {
-  localStorage.setItem('blufox_state', JSON.stringify(state));
-}
-
-function resetState() {
-  ALL_STORES.forEach(s => { state[s.name] = { traffic: 0, xm: 0, wt: 0, rgus: 0, accy: 0, tchart: 0 }; });
-  saveState();
-  // Force full DOM rebuild so all inputs visually reset to 0
-  buildTrafficGrid();
-  ['north','south','east','bigsouth'].forEach(d => {
-    buildDistrictTable(d);
-    renderDistrictStats(d);
-  });
-  renderRecap();
-  renderLeaderboard();
-  updateTrafficTotals();
-  showToast('🔄 All data reset to zero!', 'danger');
-}
+function save() { localStorage.setItem('blufox_daily', JSON.stringify(state)); }
 
 // ============================================================
-// CALCULATIONS
+// MATH
 // ============================================================
+function pct(v)    { return (v*100).toFixed(1)+'%'; }
+function dollar(v) { return '$'+v.toFixed(2); }
 
-function mcr(store) {
-  // Mobile Close Rate = (XM + Watches/Tabs) / Traffic
-  const t = +state[store].traffic || 0;
-  const x = +state[store].xm || 0;
-  const w = +state[store].wt || 0;
-  return t > 0 ? (x + w) / t : 0;
-}
-
-function wtRate(store) {
-  // Watch/Tab rate = Watches+Tabs / Traffic
-  const t = +state[store].traffic || 0;
-  const w = +state[store].wt || 0;
-  return t > 0 ? w / t : 0;
-}
-
-function fcr(store) {
-  // Fiscal Close Rate = RGUs / Traffic
-  const t = +state[store].traffic || 0;
-  const r = +state[store].rgus || 0;
-  return t > 0 ? r / t : 0;
-}
-
-function accyPerBox(store) {
-  // Accessory Per Box = Accessory $ / XM sold
-  const x = +state[store].xm || 0;
-  const a = +state[store].accy || 0;
-  return x > 0 ? a / x : 0;
-}
-
-function tchartRate(store) {
-  // T-Chart Close Rate = T-Charts / Traffic
-  const t = +state[store].traffic || 0;
-  const c = +state[store].tchart || 0;
-  return t > 0 ? c / t : 0;
-}
-
-function tchartStatus(v, hasTraffic) { if (!hasTraffic) return ''; return v >= 0.15 ? 'green' : 'red'; }
-
-function districtTotals(distKey) {
-  const stores = DISTRICTS[distKey].stores;
-  let traffic=0, xm=0, wt=0, rgus=0, accy=0, tchart=0;
-  stores.forEach(s => {
-    traffic += +state[s].traffic || 0;
-    xm      += +state[s].xm || 0;
-    wt      += +state[s].wt || 0;
-    rgus    += +state[s].rgus || 0;
-    accy    += +state[s].accy || 0;
-    tchart  += +state[s].tchart || 0;
+function distTot(dk) {
+  let t=0,xm=0,wt=0,rgu=0,acc=0,tc=0;
+  DISTRICTS[dk].stores.forEach(s=>{
+    const st=state[s]||blankStore();
+    t+=+st.traffic||0; xm+=+st.xm||0; wt+=+st.wt||0;
+    rgu+=+st.rgus||0; acc+=+st.accy||0; tc+=+st.tchart||0;
   });
-  const d_mcr    = traffic > 0 ? (xm + wt) / traffic : 0;
-  const d_wt     = traffic > 0 ? wt / traffic : 0;
-  const d_fcr    = traffic > 0 ? rgus / traffic : 0;
-  const d_apb    = xm > 0 ? accy / xm : 0;
-  const d_tchart = traffic > 0 ? tchart / traffic : 0;
-  return { traffic, xm, wt, rgus, accy, tchart, mcr: d_mcr, wtRate: d_wt, fcr: d_fcr, apb: d_apb, tchartRate: d_tchart };
+  return {traffic:t,xm,wt,rgus:rgu,accy:acc,tchart:tc,
+    mcr:t>0?(xm+wt)/t:0, wtr:t>0?wt/t:0, fcr:t>0?rgu/t:0,
+    apb:xm>0?acc/xm:0, tcr:t>0?tc/t:0};
 }
 
-function fmtPct(v) { return (v * 100).toFixed(1) + '%'; }
-function fmtDollar(v) { return '$' + v.toFixed(2); }
-
-// Threshold helpers — return 'green', 'red', or '' (no data)
-function mcrStatus(v, hasTraffic)  { if (!hasTraffic) return ''; return v >= 0.07 ? 'green' : 'red'; }
-function wtStatus(v, hasTraffic)   { if (!hasTraffic) return ''; return v >= 0.02 ? 'green' : 'red'; }
-function fcrStatus(v, hasTraffic)  { if (!hasTraffic) return ''; return v >= 0.10 ? 'green' : 'red'; }
-function apbStatus(v, hasXm)       { if (!hasXm) return ''; return v >= 20 ? 'green' : 'red'; }
-
-function metricCellClass(status) {
-  if (status === 'green') return 'rate-cell rate-good';
-  if (status === 'red')   return 'rate-cell rate-bad';
-  return 'rate-cell rate-zero';
+function combTot(keys) {
+  let t=0,xm=0,wt=0,rgu=0,acc=0,tc=0;
+  keys.forEach(dk=>{const d=distTot(dk);t+=d.traffic;xm+=d.xm;wt+=d.wt;rgu+=d.rgus;acc+=d.accy;tc+=d.tchart;});
+  return {traffic:t,xm,wt,rgus:rgu,accy:acc,tchart:tc,
+    mcr:t>0?(xm+wt)/t:0, wtr:t>0?wt/t:0, fcr:t>0?rgu/t:0,
+    apb:xm>0?acc/xm:0, tcr:t>0?tc/t:0};
 }
 
-function storeNameColor(storeName) {
-  const t  = +state[storeName].traffic || 0;
-  const x  = +state[storeName].xm || 0;
-  const w  = +state[storeName].wt || 0;
-  const r  = +state[storeName].rgus || 0;
-  const a  = +state[storeName].accy || 0;
-  const tc = +state[storeName].tchart || 0;
-  const hasTraffic = t > 0;
-  const hasXm = x > 0;
+function mcrCls(v,hasT) { if(!hasT)return ''; return v>=0.07?'green':'red'; }
+function wtrCls(v,hasT) { if(!hasT)return ''; return v>=0.02?'green':'red'; }
+function fcrCls(v,hasT) { if(!hasT)return ''; return v>=0.10?'green':'red'; }
+function apbCls(v,hasX) { if(!hasX)return '';  return v>=20 ?'green':'red'; }
+function tcrCls(v,hasT) { if(!hasT)return ''; return v>=0.15?'green':'red'; }
+function rateCellCls(s) { return s==='green'?'rate-cell rate-good':s==='red'?'rate-cell rate-bad':'rate-cell rate-zero'; }
 
-  // Yellow = traffic exists but no sales data entered yet
-  if (hasTraffic && x === 0 && w === 0 && r === 0 && a === 0 && tc === 0) return 'store-no-data';
-  if (!hasTraffic) return '';
-
-  const m  = mcrStatus(mcr(storeName), hasTraffic);
-  const wt = wtStatus(wtRate(storeName), hasTraffic);
-  const f  = fcrStatus(fcr(storeName), hasTraffic);
-  const ap = apbStatus(accyPerBox(storeName), hasXm);
-  const statuses = [m, wt, f, ap].filter(s => s !== '');
-  if (statuses.length === 0) return '';
-  if (statuses.every(s => s === 'green')) return 'store-all-green';
-  if (statuses.every(s => s === 'red'))   return 'store-all-red';
+function nameColor(name) {
+  const st=state[name]||blankStore();
+  const t=st.traffic||0,x=st.xm||0,hasT=t>0,hasX=x>0;
+  if (!hasT) return '';
+  if (st.xm===0&&st.wt===0&&st.rgus===0&&st.accy===0&&st.tchart===0) return 'store-no-data';
+  const m=mcrCls((x+(st.wt||0))/t,hasT), w=wtrCls((st.wt||0)/t,hasT),
+        f=fcrCls((st.rgus||0)/t,hasT), a=apbCls(hasX?(st.accy||0)/x:0,hasX);
+  const all=[m,w,f,a].filter(s=>s!=='');
+  if (all.length&&all.every(s=>s==='green')) return 'store-all-green';
+  if (all.length&&all.every(s=>s==='red'))   return 'store-all-red';
   return '';
-}
-
-// ============================================================
-// DISTRICT RESET
-// ============================================================
-
-function confirmResetDistrict(distKey) {
-  const label = DISTRICTS[distKey].label;
-  DISTRICTS[distKey].stores.forEach(s => {
-    state[s].xm = 0; state[s].wt = 0; state[s].rgus = 0; state[s].accy = 0; state[s].tchart = 0;
-  });
-  saveState();
-  buildDistrictTable(distKey);
-  renderDistrictStats(distKey);
-  renderLeaderboard();
-  renderRecap();
-  showToast(`🔄 ${label} reset!`, 'danger');
-}
-
-// ============================================================
-// MARKET RECAP
-// ============================================================
-
-const CHICAGO_DISTRICTS = ['north', 'south', 'east'];
-
-function chicagoTotals() {
-  let traffic=0, xm=0, wt=0, rgus=0, accy=0, tchart=0;
-  CHICAGO_DISTRICTS.forEach(dk => {
-    const d = districtTotals(dk);
-    traffic += d.traffic; xm += d.xm; wt += d.wt; rgus += d.rgus; accy += d.accy; tchart += d.tchart;
-  });
-  const mcr_v    = traffic > 0 ? (xm + wt) / traffic : 0;
-  const wt_v     = traffic > 0 ? wt / traffic : 0;
-  const fcr_v    = traffic > 0 ? rgus / traffic : 0;
-  const apb_v    = xm > 0 ? accy / xm : 0;
-  const tchart_v = traffic > 0 ? tchart / traffic : 0;
-  return { traffic, xm, wt, rgus, accy, tchart, mcr: mcr_v, wtRate: wt_v, fcr: fcr_v, apb: apb_v, tchartRate: tchart_v };
-}
-
-function recapMetricHtml(label, value, status, colorClass) {
-  const cls = status === 'green' ? 'recap-metric-good' : status === 'red' ? 'recap-metric-bad' : 'recap-metric-neutral';
-  return `
-    <div class="recap-metric ${cls}">
-      <div class="recap-metric-label">${label}</div>
-      <div class="recap-metric-value">${value}</div>
-    </div>`;
-}
-
-function grandTotals() {
-  let traffic=0, xm=0, wt=0, rgus=0, accy=0, tchart=0;
-  ['north','south','east','bigsouth'].forEach(dk => {
-    const d = districtTotals(dk);
-    traffic += d.traffic; xm += d.xm; wt += d.wt; rgus += d.rgus; accy += d.accy; tchart += d.tchart;
-  });
-  const mcr_v    = traffic > 0 ? (xm + wt) / traffic : 0;
-  const wt_v     = traffic > 0 ? wt / traffic : 0;
-  const fcr_v    = traffic > 0 ? rgus / traffic : 0;
-  const apb_v    = xm > 0 ? accy / xm : 0;
-  const tchart_v = traffic > 0 ? tchart / traffic : 0;
-  return { traffic, xm, wt, rgus, accy, tchart, mcr: mcr_v, wtRate: wt_v, fcr: fcr_v, apb: apb_v, tchartRate: tchart_v };
-}
-
-function recapTotalsHtml(d, accentColor) {
-  const hasT = d.traffic > 0;
-  const hasX = d.xm > 0;
-  const mS = mcrStatus(d.mcr, hasT);
-  const wS = wtStatus(d.wtRate, hasT);
-  const fS = fcrStatus(d.fcr, hasT);
-  const aS = apbStatus(d.apb, hasX);
-  const tS = tchartStatus(d.tchartRate, hasT);
-  return `
-    ${recapMetricHtml('MCR', hasT ? fmtPct(d.mcr) : '0.0%', mS, '')}
-    ${recapMetricHtml('Watch/Tab CR', hasT ? fmtPct(d.wtRate) : '0.0%', wS, '')}
-    ${recapMetricHtml('Fiscal CR', hasT ? fmtPct(d.fcr) : '0.0%', fS, '')}
-    ${recapMetricHtml('T-Chart CR', hasT ? fmtPct(d.tchartRate) : '0.0%', tS, '')}
-    ${recapMetricHtml('Accy / Box', hasX ? fmtDollar(d.apb) : '$0.00', aS, '')}
-    ${recapMetricHtml('Total XM', d.xm, '', '')}
-    ${recapMetricHtml('Watch/Tab', d.wt, '', '')}
-    ${recapMetricHtml('RGUs', d.rgus, '', '')}
-    ${recapMetricHtml('T-Charts', d.tchart, '', '')}
-    ${recapMetricHtml('Accy $', '$' + d.accy.toLocaleString(), '', '')}
-  `;
-}
-
-function renderRecap() {
-  const districtsEl  = document.getElementById('recap-districts');
-  const chicagoEl    = document.getElementById('recap-chicago-grid');
-  const marketEl     = document.getElementById('recap-market-grid');
-  if (!districtsEl || !chicagoEl || !marketEl) return;
-
-  // All 4 districts
-  const allDistricts = [
-    { key: 'north',    name: 'Chicago North', color: 'var(--north)'    },
-    { key: 'south',    name: 'Chicago South', color: 'var(--south)'    },
-    { key: 'east',     name: 'Chicago East',  color: 'var(--east)'     },
-    { key: 'bigsouth', name: 'The Big South', color: 'var(--bigsouth)' },
-  ];
-
-  districtsEl.innerHTML = '';
-
-  allDistricts.forEach(({ key, name, color }) => {
-    const d = districtTotals(key);
-    const hasT = d.traffic > 0;
-    const hasX = d.xm > 0;
-    const mS = mcrStatus(d.mcr, hasT);
-    const wS = wtStatus(d.wtRate, hasT);
-    const fS = fcrStatus(d.fcr, hasT);
-    const aS = apbStatus(d.apb, hasX);
-    const tS = tchartStatus(d.tchartRate, hasT);
-
-    const section = document.createElement('div');
-    section.className = 'recap-section';
-    section.style.marginBottom = '8px';
-    section.innerHTML = `
-      <div class="recap-section-header" style="color:${color}; font-size:1.1rem;">
-        ${name}
-        <span style="font-size:0.7rem; opacity:0.6; font-family:'Share Tech Mono',monospace; margin-left:12px;">
-          XM: ${d.xm} &nbsp;|&nbsp; Watch/Tab: ${d.wt} &nbsp;|&nbsp; RGUs: ${d.rgus} &nbsp;|&nbsp; T-Charts: ${d.tchart} &nbsp;|&nbsp; Accy: $${d.accy.toLocaleString()}
-        </span>
-      </div>
-      <div class="recap-grid">
-        ${recapMetricHtml('MCR', hasT ? fmtPct(d.mcr) : '0.0%', mS, color)}
-        ${recapMetricHtml('Watch/Tab CR', hasT ? fmtPct(d.wtRate) : '0.0%', wS, color)}
-        ${recapMetricHtml('Fiscal CR', hasT ? fmtPct(d.fcr) : '0.0%', fS, color)}
-        ${recapMetricHtml('T-Chart CR', hasT ? fmtPct(d.tchartRate) : '0.0%', tS, color)}
-        ${recapMetricHtml('Accy / Box', hasX ? fmtDollar(d.apb) : '$0.00', aS, color)}
-        ${recapMetricHtml('Total RGUs', d.rgus, '', color)}
-      </div>
-    `;
-    districtsEl.appendChild(section);
-  });
-
-  // Chicago combined total (North + South + East only)
-  const chi = chicagoTotals();
-  chicagoEl.innerHTML = recapTotalsHtml(chi, '#00d4ff');
-
-  // Grand total (all 4 districts)
-  const grand = grandTotals();
-  marketEl.innerHTML = recapTotalsHtml(grand, '#ffd700');
 }
 
 // ============================================================
 // TRAFFIC TAB
 // ============================================================
-
 function buildTrafficGrid() {
-  const grid = document.getElementById('traffic-grid');
-  if (!grid) return;
-  grid.innerHTML = '';
-  Object.entries(DISTRICTS).forEach(([distKey, dist]) => {
-    dist.stores.forEach(storeName => {
-      const card = document.createElement('div');
-      card.className = 'store-traffic-card';
-      card.innerHTML = `
-        <div>
-          <div class="store-name-label">${storeName}</div>
-          <div class="store-district-label color-${dist.color}">${dist.label}</div>
-        </div>
-        <input type="number" class="traffic-input" min="0"
-          value="${state[storeName].traffic || ''}"
-          id="traf-${encodeId(storeName)}"
-          onchange="updateTraffic('${storeName}', this.value)"
-          oninput="updateTraffic('${storeName}', this.value)"
-          placeholder="0">
-      `;
-      grid.appendChild(card);
+  const grid=document.getElementById('traffic-grid'); if(!grid)return;
+  grid.innerHTML='';
+  Object.entries(DISTRICTS).forEach(([dk,dist])=>{
+    dist.stores.forEach(name=>{
+      const c=document.createElement('div'); c.className='store-traffic-card';
+      c.innerHTML=`<div><div class="store-name-label">${name}</div><div class="store-district-label color-${dist.color}">${dist.label}</div></div>
+        <input type="number" class="traffic-input" min="0" value="${state[name].traffic||''}" placeholder="0"
+          oninput="setTraffic('${name}',this.value)">`;
+      grid.appendChild(c);
     });
   });
-  updateTrafficTotals();
+  updateTotals();
 }
 
-function updateTraffic(storeName, val) {
-  state[storeName].traffic = parseInt(val) || 0;
-  saveState();
-  updateTrafficTotals();
-  renderDistrictStats('north');
-  renderDistrictStats('south');
-  renderDistrictStats('east');
-  renderDistrictStats('bigsouth');
-  renderRecap();
-  renderLeaderboard();
-  refreshDistrictTable('north');
-  refreshDistrictTable('south');
-  refreshDistrictTable('east');
-  refreshDistrictTable('bigsouth');
+function setTraffic(name,val) {
+  state[name].traffic=parseInt(val)||0; save(); updateTotals();
+  ['north','south','east','bigsouth'].forEach(dk=>{refreshDistTable(dk);renderStats(dk);});
+  renderRecap(); renderLB();
 }
 
-function updateTrafficTotals() {
-  let total = 0;
-  const tots = { north:0, south:0, east:0, bigsouth:0 };
-  ALL_STORES.forEach(s => {
-    const t = +state[s.name].traffic || 0;
-    total += t;
-    tots[s.district] += t;
-  });
-  const td = document.getElementById('total-traffic-display');
-  const tn = document.getElementById('tot-north');
-  const ts = document.getElementById('tot-south');
-  const te = document.getElementById('tot-east');
-  const tb = document.getElementById('tot-big');
-  if (td) td.textContent = total.toLocaleString();
-  if (tn) tn.textContent = tots.north.toLocaleString();
-  if (ts) ts.textContent = tots.south.toLocaleString();
-  if (te) te.textContent = tots.east.toLocaleString();
-  if (tb) tb.textContent = tots.bigsouth.toLocaleString();
+function updateTotals() {
+  let tot=0; const t={north:0,south:0,east:0,bigsouth:0};
+  ALL_STORES.forEach(s=>{const v=+state[s.name].traffic||0;tot+=v;t[s.district]+=v;});
+  document.getElementById('total-traffic-display').textContent=tot.toLocaleString();
+  document.getElementById('tot-north').textContent=t.north.toLocaleString();
+  document.getElementById('tot-south').textContent=t.south.toLocaleString();
+  document.getElementById('tot-east').textContent=t.east.toLocaleString();
+  document.getElementById('tot-big').textContent=t.bigsouth.toLocaleString();
 }
 
 // ============================================================
 // DISTRICT TABLES
 // ============================================================
-
-function buildDistrictTable(distKey) {
-  const dist = DISTRICTS[distKey];
-  const tableEl = document.getElementById(distKey + '-table');
-  if (!tableEl) return;
-
-  tableEl.innerHTML = `
-    <thead>
-      <tr>
-        <th>Location</th>
-        <th>XM</th>
-        <th>Watch/Tab</th>
-        <th>RGUs</th>
-        <th>Accy $</th>
-        <th>T-Charts</th>
-        <th>Mobile CR</th>
-        <th>Watch CR</th>
-        <th>Fiscal CR</th>
-        <th>Accy/Box</th>
-        <th>T-Chart CR</th>
-      </tr>
-    </thead>
-    <tbody id="${distKey}-tbody"></tbody>
-  `;
-
-  const tbody = document.getElementById(distKey + '-tbody');
-
-  dist.stores.forEach(storeName => {
-    const st = state[storeName];
-    const tr = document.createElement('tr');
-    tr.id = 'row-' + encodeId(storeName);
-    tr.innerHTML = storeRow(storeName, st, dist.color, distKey);
-    tbody.appendChild(tr);
+function buildDistTable(dk) {
+  const tableEl=document.getElementById(dk+'-table'); if(!tableEl)return;
+  tableEl.innerHTML=`<thead><tr>
+    <th>Location</th><th>XM</th><th>Watch/Tab</th><th>RGUs</th>
+    <th>Accy $</th><th>T-Charts</th>
+    <th>Mobile CR</th><th>Watch CR</th><th>Fiscal CR</th><th>Accy/Box</th><th>T-Chart CR</th>
+  </tr></thead><tbody id="${dk}-tbody"></tbody>`;
+  const tbody=document.getElementById(dk+'-tbody');
+  DISTRICTS[dk].stores.forEach(name=>{
+    const tr=document.createElement('tr'); tr.id='row-'+eid(name);
+    tr.innerHTML=storeRowHtml(name,dk); tbody.appendChild(tr);
   });
-
-  // District totals row
-  const dtRow = document.createElement('tr');
-  dtRow.className = 'district-row';
-  dtRow.id = distKey + '-district-row';
-  dtRow.innerHTML = districtRow(distKey);
-  tbody.appendChild(dtRow);
+  const tot=document.createElement('tr'); tot.className='district-row'; tot.id=dk+'-dtot';
+  tot.innerHTML=distTotRow(dk); tbody.appendChild(tot);
 }
 
-function storeRow(storeName, st, colorClass, distKey) {
-  const id = encodeId(storeName);
-  const t = +st.traffic || 0;
-  const x = +st.xm || 0;
-  const hasTraffic = t > 0;
-  const hasXm = x > 0;
-  const m  = mcr(storeName);
-  const w  = wtRate(storeName);
-  const f  = fcr(storeName);
-  const a  = accyPerBox(storeName);
-  const tc = tchartRate(storeName);
-  const ms = mcrStatus(m, hasTraffic);
-  const ws = wtStatus(w, hasTraffic);
-  const fs = fcrStatus(f, hasTraffic);
-  const as = apbStatus(a, hasXm);
-  const ts = tchartStatus(tc, hasTraffic);
-  const nameClass = storeNameColor(storeName);
+function storeRowHtml(name,dk) {
+  const id=eid(name),st=state[name]||blankStore();
+  const t=st.traffic||0,x=st.xm||0,hasT=t>0,hasX=x>0;
+  const mcrv=(x+(st.wt||0))/(t||1),wtrv=(st.wt||0)/(t||1),fcrv=(st.rgus||0)/(t||1),apbv=hasX?(st.accy||0)/x:0,tcrv=(st.tchart||0)/(t||1);
+  const nc=nameColor(name);
+  const inp=(f,v)=>`<input type="number" class="num-input" min="0" value="${v>0?v:''}" placeholder="0" oninput="setStore('${name}','${f}',this.value,'${dk}')">`;
+  const rc=(v,cls)=>`<td class="${rateCellCls(cls)}" id="${cls.slice(0,3)}-${id}">${hasT?(cls==='apb'?dollar(v):pct(v)):'—'}</td>`;
   return `
-    <td class="store-name-cell ${nameClass}" id="name-${id}">${storeName}</td>
-    <td><input type="number" class="num-input" min="0" value="${st.xm||''}" placeholder="0"
-        onchange="updateStore('${storeName}','xm',this.value,'${distKey}')"
-        oninput="updateStore('${storeName}','xm',this.value,'${distKey}')"></td>
-    <td><input type="number" class="num-input" min="0" value="${st.wt||''}" placeholder="0"
-        onchange="updateStore('${storeName}','wt',this.value,'${distKey}')"
-        oninput="updateStore('${storeName}','wt',this.value,'${distKey}')"></td>
-    <td><input type="number" class="num-input" min="0" value="${st.rgus||''}" placeholder="0"
-        onchange="updateStore('${storeName}','rgus',this.value,'${distKey}')"
-        oninput="updateStore('${storeName}','rgus',this.value,'${distKey}')"></td>
-    <td><input type="number" class="num-input" min="0" value="${st.accy||''}" placeholder="0"
-        onchange="updateStore('${storeName}','accy',this.value,'${distKey}')"
-        oninput="updateStore('${storeName}','accy',this.value,'${distKey}')"></td>
-    <td><input type="number" class="num-input" min="0" value="${st.tchart||''}" placeholder="0"
-        onchange="updateStore('${storeName}','tchart',this.value,'${distKey}')"
-        oninput="updateStore('${storeName}','tchart',this.value,'${distKey}')"></td>
-    <td class="${metricCellClass(ms)}" id="mcr-${id}">${hasTraffic ? fmtPct(m) : '—'}</td>
-    <td class="${metricCellClass(ws)}" id="wtr-${id}">${hasTraffic ? fmtPct(w) : '—'}</td>
-    <td class="${metricCellClass(fs)}" id="fcr-${id}">${hasTraffic ? fmtPct(f) : '—'}</td>
-    <td class="${metricCellClass(as)}" id="apb-${id}">${hasXm ? fmtDollar(a) : '—'}</td>
-    <td class="${metricCellClass(ts)}" id="tcr-${id}">${hasTraffic ? fmtPct(tc) : '—'}</td>
-  `;
+    <td class="store-name-cell ${nc}" id="nm-${id}">${name}</td>
+    <td>${inp('xm',st.xm)}</td><td>${inp('wt',st.wt)}</td><td>${inp('rgus',st.rgus)}</td>
+    <td>${inp('accy',st.accy)}</td><td>${inp('tchart',st.tchart)}</td>
+    <td class="${rateCellCls(mcrCls(mcrv,hasT))}" id="mcr-${id}">${hasT?pct(mcrv):'—'}</td>
+    <td class="${rateCellCls(wtrCls(wtrv,hasT))}" id="wtr-${id}">${hasT?pct(wtrv):'—'}</td>
+    <td class="${rateCellCls(fcrCls(fcrv,hasT))}" id="fcr-${id}">${hasT?pct(fcrv):'—'}</td>
+    <td class="${rateCellCls(apbCls(apbv,hasX))}" id="apb-${id}">${hasX?dollar(apbv):'—'}</td>
+    <td class="${rateCellCls(tcrCls(tcrv,hasT))}" id="tcr-${id}">${hasT?pct(tcrv):'—'}</td>`;
 }
 
-function districtRow(distKey) {
-  const d = districtTotals(distKey);
-  return `
-    <td>▶ TOTAL</td>
-    <td>${d.xm}</td>
-    <td>${d.wt}</td>
-    <td>${d.rgus}</td>
-    <td>${d.accy}</td>
-    <td>${d.tchart}</td>
-    <td>${fmtPct(d.mcr)}</td>
-    <td>${fmtPct(d.wtRate)}</td>
-    <td>${fmtPct(d.fcr)}</td>
-    <td>${d.xm > 0 ? fmtDollar(d.apb) : '—'}</td>
-    <td>${fmtPct(d.tchartRate)}</td>
-  `;
+function distTotRow(dk) {
+  const d=distTot(dk);
+  const f=(v,cls,hasT,hasX)=>hasT?(cls==='apb'?(hasX?dollar(v):'—'):pct(v)):'—';
+  return `<td>▶ TOTAL</td><td>${d.xm}</td><td>${d.wt}</td><td>${d.rgus}</td>
+    <td>${d.accy}</td><td>${d.tchart}</td>
+    <td>${f(d.mcr,'mcr',d.traffic>0)}</td><td>${f(d.wtr,'wtr',d.traffic>0)}</td>
+    <td>${f(d.fcr,'fcr',d.traffic>0)}</td><td>${f(d.apb,'apb',d.traffic>0,d.xm>0)}</td>
+    <td>${f(d.tcr,'tcr',d.traffic>0)}</td>`;
 }
 
-function updateStore(storeName, field, val, distKey) {
-  state[storeName][field] = parseInt(val) || 0;
-  saveState();
-  refreshStoreRow(storeName);
-  const dr = document.getElementById(distKey + '-district-row');
-  if (dr) dr.innerHTML = districtRow(distKey);
-  renderDistrictStats(distKey);
-  renderRecap();
-  renderLeaderboard();
+function setStore(name,field,val,dk) {
+  state[name][field]=parseInt(val)||0; save();
+  refreshRow(name);
+  const dr=document.getElementById(dk+'-dtot'); if(dr) dr.innerHTML=distTotRow(dk);
+  renderStats(dk); renderRecap(); renderLB();
 }
 
-function refreshStoreRow(storeName) {
-  const id = encodeId(storeName);
-  const t = +state[storeName].traffic || 0;
-  const x = +state[storeName].xm || 0;
-  const hasTraffic = t > 0;
-  const hasXm = x > 0;
-  const m  = mcr(storeName);
-  const w  = wtRate(storeName);
-  const f  = fcr(storeName);
-  const a  = accyPerBox(storeName);
-  const tc = tchartRate(storeName);
-  const ms = mcrStatus(m, hasTraffic);
-  const ws = wtStatus(w, hasTraffic);
-  const fs = fcrStatus(f, hasTraffic);
-  const as = apbStatus(a, hasXm);
-  const ts = tchartStatus(tc, hasTraffic);
-
-  const mcrEl  = document.getElementById('mcr-' + id);
-  const wtrEl  = document.getElementById('wtr-' + id);
-  const fcrEl  = document.getElementById('fcr-' + id);
-  const apbEl  = document.getElementById('apb-' + id);
-  const tcrEl  = document.getElementById('tcr-' + id);
-  const nameEl = document.getElementById('name-' + id);
-
-  if (mcrEl)  { mcrEl.textContent  = hasTraffic ? fmtPct(m)    : '0.0%';   mcrEl.className  = metricCellClass(ms); }
-  if (wtrEl)  { wtrEl.textContent  = hasTraffic ? fmtPct(w)    : '0.0%';   wtrEl.className  = metricCellClass(ws); }
-  if (fcrEl)  { fcrEl.textContent  = hasTraffic ? fmtPct(f)    : '0.0%';   fcrEl.className  = metricCellClass(fs); }
-  if (tcrEl)  { tcrEl.textContent  = hasTraffic ? fmtPct(tc)   : '0.0%';   tcrEl.className  = metricCellClass(ts); }
-  if (apbEl)  { apbEl.textContent  = hasXm      ? fmtDollar(a) : '$0.00';  apbEl.className  = metricCellClass(as); }
-  if (nameEl) {
-    const nc = storeNameColor(storeName);
-    nameEl.className = 'store-name-cell ' + nc;
-  }
-}
-
-function refreshDistrictTable(distKey) {
-  const dist = DISTRICTS[distKey];
-  dist.stores.forEach(storeName => {
-    refreshStoreRow(storeName);
+function refreshRow(name) {
+  const id=eid(name),st=state[name]||blankStore();
+  const t=st.traffic||0,x=st.xm||0,hasT=t>0,hasX=x>0;
+  const vals={
+    mcr:{v:(x+(st.wt||0))/(t||1),cls:mcrCls,thr:null},
+    wtr:{v:(st.wt||0)/(t||1),cls:wtrCls,thr:null},
+    fcr:{v:(st.rgus||0)/(t||1),cls:fcrCls,thr:null},
+    apb:{v:hasX?(st.accy||0)/x:0,cls:apbCls,isDollar:true},
+    tcr:{v:(st.tchart||0)/(t||1),cls:tcrCls,thr:null}
+  };
+  Object.entries(vals).forEach(([key,{v,cls,isDollar}])=>{
+    const el=document.getElementById(key+'-'+id); if(!el)return;
+    const isApb=(key==='apb');
+    const status=isApb?apbCls(v,hasX):cls(v,hasT);
+    el.className=rateCellCls(status);
+    el.textContent=hasT?(isApb?(hasX?dollar(v):'—'):pct(v)):'—';
   });
-  const dr = document.getElementById(distKey + '-district-row');
-  if (dr) dr.innerHTML = districtRow(distKey);
-  renderDistrictStats(distKey);
+  const nm=document.getElementById('nm-'+id); if(nm) nm.className='store-name-cell '+nameColor(name);
 }
 
-function renderDistrictStats(distKey) {
-  const d = districtTotals(distKey);
-  const c = `var(--${DISTRICTS[distKey].color})`;
-  const el = document.getElementById(distKey + '-stats-bar');
-  if (!el) return;
-  const card = (label, val) => `
-    <div class="dsb-card" style="--dsb-color:${c}">
-      <span class="dsb-label">${label}</span>
-      <span class="dsb-value">${val}</span>
-    </div>`;
-  el.innerHTML =
-    card('Traffic', d.traffic.toLocaleString()) +
-    card('MCR', fmtPct(d.mcr)) +
-    card('Watch CR', fmtPct(d.wtRate)) +
-    card('Fiscal CR', fmtPct(d.fcr)) +
-    card('T-Chart CR', fmtPct(d.tchartRate)) +
-    card('RGUs', d.rgus) +
-    card('XM', d.xm) +
-    card('Watch/Tab', d.wt) +
-    card('Accy/Box', d.xm > 0 ? fmtDollar(d.apb) : '$0');
+function refreshDistTable(dk) {
+  DISTRICTS[dk].stores.forEach(name=>refreshRow(name));
+  const dr=document.getElementById(dk+'-dtot'); if(dr) dr.innerHTML=distTotRow(dk);
+  renderStats(dk);
+}
+
+function renderStats(dk) {
+  const d=distTot(dk),c=`var(--${DISTRICTS[dk].color})`;
+  const el=document.getElementById(dk+'-stats'); if(!el)return;
+  const card=(label,val)=>`<div class="stat-card" style="--card-color:${c}"><div class="stat-label">${label}</div><div class="stat-value">${val}</div></div>`;
+  el.innerHTML=
+    card('Traffic',d.traffic.toLocaleString())+card('Mobile CR',pct(d.mcr))+card('Watch CR',pct(d.wtr))+
+    card('Fiscal CR',pct(d.fcr))+card('T-Chart CR',pct(d.tcr))+
+    card('XM',d.xm)+card('Watch/Tab',d.wt)+card('RGUs',d.rgus)+card('Accy/Box',d.xm>0?dollar(d.apb):'$0.00');
+}
+
+// ============================================================
+// MARKET RECAP
+// ============================================================
+function recapBlock(d,color,title,subtitle) {
+  const hasT=d.traffic>0,hasX=d.xm>0;
+  const rm=(cls)=>cls==='green'?'rm-green':cls==='red'?'rm-red':'rm-neu';
+  const met=(label,val,rmCls)=>`<div class="recap-metric ${rmCls}"><div class="rm-label">${label}</div><div class="rm-value${String(val).length>7?' sm':''}">${val}</div></div>`;
+  return `<div class="recap-section">
+    <div class="recap-header" style="color:${color}">${title}${subtitle?`<span class="sub">${subtitle}</span>`:''}
+    </div>
+    <div class="recap-row">
+      ${met('Traffic',d.traffic.toLocaleString(),'rm-neu')}
+      ${met('XM',d.xm,'rm-neu')}
+      ${met('Watch/Tab',d.wt,'rm-neu')}
+      ${met('RGUs',d.rgus,'rm-neu')}
+      ${met('Accy $','$'+(d.accy||0).toLocaleString(),'rm-neu')}
+      ${met('T-Charts',d.tchart,'rm-neu')}
+    </div>
+    <div class="recap-row">
+      ${met('Mobile CR',hasT?pct(d.mcr):'—',rm(mcrCls(d.mcr,hasT)))}
+      ${met('Watch/Tab CR',hasT?pct(d.wtr):'—',rm(wtrCls(d.wtr,hasT)))}
+      ${met('Fiscal CR',hasT?pct(d.fcr):'—',rm(fcrCls(d.fcr,hasT)))}
+      ${met('Accy / Box',hasX?dollar(d.apb):'—',rm(apbCls(d.apb,hasX)))}
+      ${met('T-Chart CR',hasT?pct(d.tcr):'—',rm(tcrCls(d.tcr,hasT)))}
+    </div>
+  </div>`;
+}
+
+function renderRecap() {
+  const dEl=document.getElementById('recap-districts');
+  const cEl=document.getElementById('recap-chicago');
+  const rEl=document.getElementById('recap-region');
+  if(!dEl||!cEl||!rEl) return;
+
+  const dists=[
+    {key:'north',name:'🔵 Chicago North',color:'var(--north)'},
+    {key:'south',name:'🟣 Chicago South',color:'var(--south)'},
+    {key:'east', name:'🟢 Chicago East', color:'var(--east)'},
+    {key:'bigsouth',name:'🟠 The Big South',color:'var(--bigsouth)'}
+  ];
+  dEl.innerHTML=dists.map(({key,name,color})=>recapBlock(distTot(key),color,name)).join('');
+
+  const chi=combTot(['north','south','east']);
+  cEl.innerHTML=recapBlock(chi,'var(--accent)','🌆 Chicago Market Combined',
+    `Traffic: ${chi.traffic.toLocaleString()} · Mobile: ${chi.xm+chi.wt} · RGUs: ${chi.rgus}`);
+
+  const grand=combTot(['north','south','east','bigsouth']);
+  rEl.innerHTML=recapBlock(grand,'var(--gold)','🌎 Full Region Grand Total',
+    `Traffic: ${grand.traffic.toLocaleString()} · Mobile: ${grand.xm+grand.wt} · RGUs: ${grand.rgus}`);
 }
 
 // ============================================================
 // LEADERBOARD
 // ============================================================
-
-function renderLeaderboard() {
-  const grid = document.getElementById('leaderboard-grid');
-  if (!grid) return;
-
-  // Build store list with all metrics
-  const storeData = ALL_STORES.map(s => ({
-    name: s.name,
-    district: s.district,
-    distLabel: DISTRICTS[s.district].label,
-    distColor: DISTRICTS[s.district].color,
-    mcr: mcr(s.name),
-    wtr: wtRate(s.name),
-    fcr: fcr(s.name),
-    apb: accyPerBox(s.name),
-    traffic: state[s.name].traffic || 0
-  }));
-
-  const categories = [
-    {
-      key: 'mcr', label: 'Mobile Close Rate', icon: '📱', color: 'var(--accent)',
-      fmt: v => fmtPct(v), bgColor: '#00d4ff'
-    },
-    {
-      key: 'fcr', label: 'Fiscal Close Rate', icon: '💰', color: 'var(--accent3)',
-      fmt: v => fmtPct(v), bgColor: '#00ff88'
-    },
-    {
-      key: 'apb', label: 'Accy Per Box', icon: '🛍️', color: 'var(--accent2)',
-      fmt: v => fmtDollar(v), bgColor: '#ff6b00'
-    },
-    {
-      key: 'wtr', label: 'Watches & Tablets', icon: '⌚', color: 'var(--bigsouth)',
-      fmt: v => fmtPct(v), bgColor: '#c77dff'
-    }
+function renderLB() {
+  const grid=document.getElementById('leaderboard-grid'); if(!grid)return;
+  const data=ALL_STORES.map(s=>{
+    const st=state[s.name]||blankStore();
+    const t=st.traffic||0,x=st.xm||0,w=st.wt||0;
+    return {name:s.name,distLabel:DISTRICTS[s.district].label,distColor:DISTRICTS[s.district].color,
+      mcr:t>0?(x+w)/t:0, wtr:t>0?w/t:0, fcr:t>0?(st.rgus||0)/t:0, apb:x>0?(st.accy||0)/x:0};
+  });
+  const cats=[
+    {key:'mcr',label:'Mobile Close Rate',icon:'📱',color:'var(--accent)',fmt:pct},
+    {key:'fcr',label:'Fiscal Close Rate',icon:'💰',color:'var(--accent3)',fmt:pct},
+    {key:'apb',label:'Accy Per Box',icon:'🛍️',color:'var(--accent2)',fmt:dollar},
+    {key:'wtr',label:'Watches & Tablets',icon:'⌚',color:'var(--bigsouth)',fmt:pct}
   ];
-
-  grid.innerHTML = '';
-
-  categories.forEach(cat => {
-    // Sort stores by this metric
-    const sorted = [...storeData].sort((a,b) => b[cat.key] - a[cat.key]);
-    const top3 = sorted.slice(0, 3);
-    const maxVal = top3[0] ? top3[0][cat.key] : 1;
-
-    const card = document.createElement('div');
-    card.className = 'leaderboard-card';
-
-    const rankClasses = ['gold','silver','bronze'];
-    const rankEmoji = ['🥇','🥈','🥉'];
-
-    let rowsHtml = top3.map((s, i) => {
-      const barPct = maxVal > 0 ? ((s[cat.key] / maxVal) * 100).toFixed(1) : 0;
-      return `
-        <div class="lb-row">
-          <div class="lb-rank ${rankClasses[i]}">${rankEmoji[i]}</div>
-          <div class="lb-info">
-            <div class="lb-store-name">${s.name}</div>
-            <div class="lb-district">${s.distLabel}</div>
-            <div class="lb-bar-wrap">
-              <div class="lb-bar bg-${s.distColor}" style="width:${barPct}%"></div>
-            </div>
-          </div>
-          <div class="lb-value" style="color:${cat.color}">${cat.fmt(s[cat.key])}</div>
+  grid.innerHTML='';
+  cats.forEach(cat=>{
+    const sorted=[...data].sort((a,b)=>b[cat.key]-a[cat.key]).slice(0,3);
+    const maxV=sorted[0]?sorted[0][cat.key]:1;
+    const noData=!sorted.length||sorted[0][cat.key]===0;
+    const ranks=['gold','silver','bronze'],emojis=['🥇','🥈','🥉'];
+    const card=document.createElement('div'); card.className='leaderboard-card';
+    card.innerHTML=`<div class="lb-header" style="color:${cat.color}"><span>${cat.icon}</span>Top 3 — ${cat.label}</div>`+
+      (noData?`<div style="padding:20px;text-align:center;color:var(--muted);font-size:0.8rem;font-family:'Share Tech Mono',monospace;">No data yet</div>`:
+      sorted.map((s,i)=>`<div class="lb-row">
+        <div class="lb-rank ${ranks[i]}">${emojis[i]}</div>
+        <div class="lb-info"><div class="lb-store-name">${s.name}</div><div class="lb-district">${s.distLabel}</div>
+          <div class="lb-bar-wrap"><div class="lb-bar bg-${s.distColor}" style="width:${maxV>0?((s[cat.key]/maxV)*100).toFixed(1):0}%"></div></div>
         </div>
-      `;
-    }).join('');
-
-    // If no data
-    if (top3.length === 0 || (top3[0] && top3[0][cat.key] === 0)) {
-      rowsHtml = '<div style="padding:24px; text-align:center; color:var(--muted); font-size:0.85rem; font-family:\'Share Tech Mono\',monospace;">No data yet — enter numbers on store tabs</div>';
-    }
-
-    card.innerHTML = `
-      <div class="lb-header" style="background: linear-gradient(135deg, var(--surface2), var(--surface)); color: ${cat.color};">
-        <span class="lb-icon">${cat.icon}</span>
-        Top 3 — ${cat.label}
-      </div>
-      ${rowsHtml}
-    `;
-
+        <div class="lb-value" style="color:${cat.color}">${cat.fmt(s[cat.key])}</div>
+      </div>`).join(''));
     grid.appendChild(card);
   });
 }
 
 // ============================================================
 // PASTE IMPORT
-// Format: "51009 - Comcast Cable Oak Ridge\t15:30\t130"
-// Columns: [Store Label] [Tab] [Time] [Tab] [Traffic]
-// Last row "Average\t\t48" is ignored automatically
 // ============================================================
-
-// Map store ID numbers and name keywords → store names in our system
-const STORE_ID_MAP = {
-  '51009': 'Oak Ridge',
-  '51011': 'Greeneville',
-  '51017': 'Hammond',
-  '51022': 'South Knoxville',
-  '51023': 'Round Lake Beach',
-  '51025': 'South Skokie',
-  '51026': 'Schererville',
-  '51031': 'Johnson City',
-  '51032': 'Burbank',
-  '51033': 'Michigan City',
-  '51035': 'South Bend',
-  '55000': 'Valparaiso',
-  '55001': 'Kildeer',
-  '55002': 'Tinley Park',
-  '55003': 'Dekalb',
-  '55004': 'Glenview',
-  '55005': 'Frankfort',
-  '55006': 'Elkhart',
-  '55008': 'Evanston',
-  '55009': 'Uptown',
-  '55010': 'Evergreen Park',
-  '55011': 'Cicero',
-  '55027': 'Bourbonnais'
-};
-
 function importPaste() {
-  const raw = document.getElementById('paste-area').value.trim();
-  if (!raw) { showToast('⚠️ Nothing to import!', 'warn'); return; }
-
-  const lines = raw.split('\n').filter(l => l.trim());
-  let updated = 0, skipped = 0;
-
-  lines.forEach(line => {
-    const parts = line.split('\t');
-    // Need at least 3 columns: label, time, traffic
-    if (parts.length < 3) return;
-
-    const label = parts[0].trim();
-    const trafficVal = parseInt(parts[2]) || 0;
-
-    // Skip the "Average" summary row
-    if (label.toLowerCase().startsWith('average')) return;
-
-    // Extract store number from the start of the label (e.g. "51009")
-    const numMatch = label.match(/^(\d{5})/);
-    if (!numMatch) { skipped++; return; }
-
-    const storeNum = numMatch[1];
-    const storeName = STORE_ID_MAP[storeNum];
-
-    if (storeName && state[storeName] !== undefined) {
-      state[storeName].traffic = trafficVal;
-      updated++;
-    } else {
-      skipped++;
-    }
+  const raw=document.getElementById('paste-area').value.trim();
+  if(!raw){showToast('⚠️ Nothing to import!','warn');return;}
+  let ok=0,skip=0;
+  raw.split('\n').filter(l=>l.trim()).forEach(line=>{
+    const parts=line.split('\t');
+    if(parts.length<3)return;
+    const label=parts[0].trim();
+    if(label.toLowerCase().startsWith('average'))return;
+    const m=label.match(/^(\d{5})/);
+    if(!m){skip++;return;}
+    const name=STORE_ID_MAP[m[1]];
+    if(name&&state[name]){state[name].traffic=parseInt(parts[2])||0;ok++;}else skip++;
   });
-
-  saveState();
+  save();
   buildTrafficGrid();
-  refreshDistrictTable('north');
-  refreshDistrictTable('south');
-  refreshDistrictTable('east');
-  refreshDistrictTable('bigsouth');
-  renderLeaderboard();
-
-  document.getElementById('paste-area').value = '';
-  showToast(`✅ Imported ${updated} stores${skipped ? ` (${skipped} unrecognized)` : ''}`, 'success');
+  ['north','south','east','bigsouth'].forEach(dk=>{refreshDistTable(dk);renderStats(dk);});
+  renderRecap(); renderLB();
+  document.getElementById('paste-area').value='';
+  showToast(`✅ Imported ${ok} stores${skip?` (${skip} skipped)`:''}`, 'success');
 }
 
 // ============================================================
-// RESET CONFIRM
+// RESET
 // ============================================================
+function resetAll() {
+  ALL_STORES.forEach(s=>{state[s.name]=blankStore();}); save();
+  buildTrafficGrid();
+  ['north','south','east','bigsouth'].forEach(dk=>{buildDistTable(dk);renderStats(dk);});
+  renderRecap(); renderLB();
+  showToast('🔄 All data reset!','danger');
+}
 
-function confirmReset() {
-  resetState();
+function resetDistrict(dk) {
+  DISTRICTS[dk].stores.forEach(s=>{const t=state[s].traffic||0;state[s]=blankStore();state[s].traffic=t;}); save();
+  buildDistTable(dk); renderStats(dk); renderRecap(); renderLB();
+  showToast(`🔄 ${DISTRICTS[dk].label} reset!`,'danger');
 }
 
 // ============================================================
-// TABS
+// TABS / CLOCK / TOAST / UTILS
 // ============================================================
-
-function switchTab(tabId) {
-  document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById('tab-' + tabId).classList.add('active');
-  document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+function switchTab(id) {
+  document.querySelectorAll('.content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelector(`[data-tab="${id}"]`).classList.add('active');
 }
-
-// ============================================================
-// CLOCK
-// ============================================================
-
 function updateClock() {
-  const now = new Date();
-  let h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  h = h % 12 || 12;
-  document.getElementById('clock').textContent =
-    `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} ${ampm}`;
+  const n=new Date();let h=n.getHours(),m=n.getMinutes(),s=n.getSeconds();
+  const ap=h>=12?'PM':'AM';h=h%12||12;
+  document.getElementById('clock').textContent=`${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} ${ap}`;
 }
-
-// ============================================================
-// TOAST
-// ============================================================
-
-function showToast(msg, type='success') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.borderColor = type === 'danger' ? 'var(--danger)' : type === 'warn' ? 'var(--accent2)' : 'var(--accent3)';
-  t.style.color = type === 'danger' ? 'var(--danger)' : type === 'warn' ? 'var(--accent2)' : 'var(--accent3)';
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+function showToast(msg,type='success') {
+  const t=document.getElementById('toast');
+  const cols={success:'var(--accent3)',danger:'var(--danger)',warn:'var(--accent2)'};
+  t.textContent=msg;t.style.borderColor=cols[type]||cols.success;t.style.color=cols[type]||cols.success;
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);
 }
-
-// ============================================================
-// UTILS
-// ============================================================
-
-function encodeId(str) {
-  return str.replace(/[^a-zA-Z0-9]/g, '_');
-}
-
-// ============================================================
-// INIT
-// ============================================================
+function eid(str){return str.replace(/[^a-zA-Z0-9]/g,'_');}
 
 function renderAll() {
   buildTrafficGrid();
-  ['north','south','east','bigsouth'].forEach(d => {
-    buildDistrictTable(d);
-    renderDistrictStats(d);
-  });
-  renderRecap();
-  renderLeaderboard();
+  ['north','south','east','bigsouth'].forEach(dk=>{buildDistTable(dk);renderStats(dk);});
+  renderRecap(); renderLB();
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  initState();
-  renderAll();
-  setInterval(updateClock, 1000);
-  updateClock();
+document.addEventListener('DOMContentLoaded',()=>{
+  initState(); renderAll();
+  setInterval(updateClock,1000); updateClock();
 });
 </script>
 </body>
