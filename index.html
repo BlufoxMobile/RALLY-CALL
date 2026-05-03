@@ -151,7 +151,13 @@ tbody td:first-child{text-align:left;padding-left:14px;font-weight:700;font-size
       <div class="header-tagline"><span class="live-dot"></span>Live Shopper Tracker — Daily Call</div>
     </div>
   </div>
-  <div class="live-clock" id="clock">--:-- --</div>
+  <div style="display:flex;align-items:center;gap:14px;">
+    <div style="text-align:right;font-family:'Share Tech Mono',monospace;font-size:0.62rem;letter-spacing:1px;line-height:1.4;">
+      <div id="tsheet-status" style="color:var(--muted);">⟳ Syncing T-Charts…</div>
+      <div><a href="#" onclick="event.preventDefault();fetchTChartsFromTSheet(false);" style="color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent);">Refresh now</a></div>
+    </div>
+    <div class="live-clock" id="clock">--:-- --</div>
+  </div>
 </header>
 
 <nav class="nav">
@@ -264,7 +270,7 @@ tbody td:first-child{text-align:left;padding-left:14px;font-weight:700;font-size
 // ============================================================
 const DISTRICTS = {
   north:    {label:'Chicago North', color:'north',    stores:['Evanston','Glenview','Kildeer','Uptown','South Skokie','Round Lake Beach']},
-  south:    {label:'Chicago South', color:'south',    stores:['Evergreen Park','Tinley Park','Frankfort','Bourbonnais','Dekalb','Burbank']},
+  south:    {label:'Chicago South', color:'south',    stores:['Evergreen Park','Tinley Park','Frankfort','Bourbonnais','Dekalb','Burbank','Calumet City']},
   east:     {label:'Chicago East',  color:'east',     stores:['Cicero','Hammond','Valparaiso','Elkhart','South Bend','Schererville','Michigan City']},
   bigsouth: {label:'Big South',     color:'big',      stores:['Oak Ridge','Greeneville','South Knoxville','Johnson City']}
 };
@@ -277,8 +283,94 @@ const STORE_ID_MAP = {
   '51032':'Burbank','51033':'Michigan City','51035':'South Bend','55000':'Valparaiso',
   '55001':'Kildeer','55002':'Tinley Park','55003':'Dekalb','55004':'Glenview',
   '55005':'Frankfort','55006':'Elkhart','55008':'Evanston','55009':'Uptown',
-  '55010':'Evergreen Park','55011':'Cicero','55027':'Bourbonnais'
+  '55010':'Evergreen Park','55011':'Cicero','55027':'Bourbonnais',
+  '51041':'Calumet City'
 };
+
+// ============================================================
+// T-CHART AUTO-SYNC (from T-Sheet-Submissions Apps Script)
+// ============================================================
+const TSHEET_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyQaa1yvggLJuw5dcme74vwAW3hSB3BvzCK40IhLThy-F8KZDFOF6gcyl8psNMd3yD-Cg/exec';
+const TSHEET_REFRESH_MS = 5 * 60 * 1000; // 5 minutes
+let tsheetTimer = null;
+
+// Map T-Sheet store names ("X Xfinity Store") -> Rally Call store names
+const TSHEET_NAME_MAP = {
+  'Evanston Xfinity Store':'Evanston',
+  'Glenview Xfinity Store':'Glenview',
+  'Kildeer Xfinity Store':'Kildeer',
+  'Round Lake Beach Xfinity Store':'Round Lake Beach',
+  'Skokie Xfinity Store':'South Skokie',
+  'Uptown Xfinity Store':'Uptown',
+  'Bourbonnais Xfinity Store':'Bourbonnais',
+  'Burbank Xfinity Store':'Burbank',
+  'Calumet City Xfinity Store':'Calumet City',
+  'Dekalb Xfinity Store':'Dekalb',
+  'Evergreen Park Xfinity Store':'Evergreen Park',
+  'Frankfort Xfinity Store':'Frankfort',
+  'Tinley Park Xfinity Store':'Tinley Park',
+  'Cicero Xfinity Store':'Cicero',
+  'Elkhart Xfinity Store':'Elkhart',
+  'Hammond Xfinity Store':'Hammond',
+  'Michigan City Xfinity Store':'Michigan City',
+  'Schererville Xfinity Store':'Schererville',
+  'South Bend Xfinity Store':'South Bend',
+  'Valparaiso Xfinity Store':'Valparaiso',
+  'Greeneville Xfinity Store':'Greeneville',
+  'Johnson City Xfinity Store':'Johnson City',
+  'Oak Ridge Xfinity Store':'Oak Ridge',
+  'South Knoxville Xfinity Store':'South Knoxville'
+};
+
+function _tsheetTodayKey() {
+  const d=new Date();
+  const p=n=>String(n).padStart(2,'0');
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+}
+function _tsheetSubDayKey(s) {
+  const d=new Date(s.timestamp);
+  const p=n=>String(n).padStart(2,'0');
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+}
+
+async function fetchTChartsFromTSheet(silent) {
+  try {
+    const res=await fetch(TSHEET_APPS_SCRIPT_URL+'?t='+Date.now(),{method:'GET'});
+    const data=await res.json();
+    if(!data||!data.success) throw new Error(data&&data.error||'tsheet error');
+    const today=_tsheetTodayKey();
+    // Zero out all t-charts then re-tally from today's submissions
+    ALL_STORES.forEach(s=>{ if(state[s.name]) state[s.name].tchart=0; });
+    let matched=0,unmatched=0;
+    (data.submissions||[]).forEach(sub=>{
+      if(!sub||_tsheetSubDayKey(sub)!==today) return;
+      const rallyName=TSHEET_NAME_MAP[sub.store]||sub.store;
+      if(state[rallyName]){ state[rallyName].tchart=(state[rallyName].tchart||0)+1; matched++; }
+      else unmatched++;
+    });
+    save();
+    ['north','south','east','bigsouth'].forEach(dk=>refreshDistTable(dk));
+    renderRecap(); renderLB();
+    const indEl=document.getElementById('tsheet-status');
+    if(indEl){
+      const t=new Date();
+      indEl.textContent='✓ T-Charts synced '+t.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      indEl.style.color='var(--accent3)';
+    }
+    if(!silent) showToast(`✅ Synced ${matched} t-charts from T-Sheet`,'success');
+  } catch(err){
+    console.error('T-Sheet sync failed',err);
+    const indEl=document.getElementById('tsheet-status');
+    if(indEl){ indEl.textContent='⚠ T-Sheet sync failed — retrying'; indEl.style.color='var(--danger)'; }
+    if(!silent) showToast('⚠️ T-Sheet sync failed','danger');
+  }
+}
+
+function startTSheetAutoSync() {
+  fetchTChartsFromTSheet(true);
+  if(tsheetTimer) clearInterval(tsheetTimer);
+  tsheetTimer=setInterval(()=>fetchTChartsFromTSheet(true),TSHEET_REFRESH_MS);
+}
 
 let state = {};
 
@@ -627,6 +719,7 @@ function renderAll() {
 document.addEventListener('DOMContentLoaded',()=>{
   initState(); renderAll();
   setInterval(updateClock,1000); updateClock();
+  startTSheetAutoSync();
 });
 </script>
 </body>
