@@ -349,6 +349,14 @@ async function fetchTChartsFromTSheet(silent) {
       else unmatched++;
     });
     save();
+    // Update each store's visible T-Charts input box from live state
+    ALL_STORES.forEach(s=>{
+      const inp=document.getElementById('tchart-inp-'+eid(s.name));
+      if(inp){
+        const v=state[s.name].tchart||0;
+        inp.value = v>0 ? v : '';
+      }
+    });
     ['north','south','east','bigsouth'].forEach(dk=>refreshDistTable(dk));
     renderRecap(); renderLB();
     const indEl=document.getElementById('tsheet-status');
@@ -492,7 +500,7 @@ function storeRowHtml(name,dk) {
   const t=st.traffic||0,x=st.xm||0,hasT=t>0,hasX=x>0;
   const mcrv=(x+(st.wt||0))/(t||1),wtrv=(st.wt||0)/(t||1),fcrv=(st.rgus||0)/(t||1),apbv=hasX?(st.accy||0)/x:0,tcrv=(st.tchart||0)/(t||1);
   const nc=nameColor(name);
-  const inp=(f,v)=>`<input type="number" class="num-input" min="0" value="${v>0?v:''}" placeholder="0" oninput="setStore('${name}','${f}',this.value,'${dk}')">`;
+  const inp=(f,v)=>`<input id="${f}-inp-${id}" type="number" class="num-input" min="0" value="${v>0?v:''}" placeholder="0" ${f==='tchart'?'readonly title="Auto-synced from T-Sheet Submissions"':''} oninput="setStore('${name}','${f}',this.value,'${dk}')">`;
   const rc=(v,cls)=>`<td class="${rateCellCls(cls)}" id="${cls.slice(0,3)}-${id}">${hasT?(cls==='apb'?dollar(v):pct(v)):'—'}</td>`;
   return `
     <td class="store-name-cell ${nc}" id="nm-${id}">${name}</td>
