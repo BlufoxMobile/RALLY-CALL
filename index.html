@@ -301,6 +301,7 @@ const TSHEET_NAME_MAP = {
   'Kildeer Xfinity Store':'Kildeer',
   'Round Lake Beach Xfinity Store':'Round Lake Beach',
   'Skokie Xfinity Store':'South Skokie',
+  'South Skokie Xfinity Store':'South Skokie', // quote sheet submits this variant (since 2026-06-01)
   'Uptown Xfinity Store':'Uptown',
   'Bourbonnais Xfinity Store':'Bourbonnais',
   'Burbank Xfinity Store':'Burbank',
@@ -428,6 +429,11 @@ function fcrCls(v,hasT) { if(!hasT)return ''; return v>=0.10?'green':'red'; }
 function apbCls(v,hasX) { if(!hasX)return '';  return v>=20 ?'green':'red'; }
 function tcrCls(v,hasT) { if(!hasT)return ''; return v>=0.15?'green':'red'; }
 function rateCellCls(s) { return s==='green'?'rate-cell rate-good':s==='red'?'rate-cell rate-bad':'rate-cell rate-zero'; }
+// Gap to 7% Mobile CR: how many more XM (or watch/tab) the store needs today.
+// MCR = (xm+wt)/traffic; smallest N so (xm+wt+N)/traffic >= 0.07.
+function mcrGapVal(t,c){ if(!(t>0))return null; return Math.max(0,Math.ceil(0.07*t-c-1e-9)); }
+function gapCls(g){ if(g===null)return ''; return g===0?'green':'red'; }
+function gapTxt(g){ if(g===null)return '—'; return g===0?'✓':('+'+g); }
 
 function nameColor(name) {
   const st=state[name]||blankStore();
@@ -485,6 +491,7 @@ function buildDistTable(dk) {
     <th>Location</th><th>XM</th><th>Watch/Tab</th><th>RGUs</th>
     <th>Accy $</th><th>T-Charts</th>
     <th>Mobile CR</th><th>Watch CR</th><th>Fiscal CR</th><th>Accy/Box</th><th>T-Chart CR</th>
+    <th title="XM or watch/tab still needed to reach 7% Mobile CR today">Gap</th>
   </tr></thead><tbody id="${dk}-tbody"></tbody>`;
   const tbody=document.getElementById(dk+'-tbody');
   DISTRICTS[dk].stores.forEach(name=>{
@@ -510,7 +517,8 @@ function storeRowHtml(name,dk) {
     <td class="${rateCellCls(wtrCls(wtrv,hasT))}" id="wtr-${id}">${hasT?pct(wtrv):'—'}</td>
     <td class="${rateCellCls(fcrCls(fcrv,hasT))}" id="fcr-${id}">${hasT?pct(fcrv):'—'}</td>
     <td class="${rateCellCls(apbCls(apbv,hasX))}" id="apb-${id}">${hasX?dollar(apbv):'—'}</td>
-    <td class="${rateCellCls(tcrCls(tcrv,hasT))}" id="tcr-${id}">${hasT?pct(tcrv):'—'}</td>`;
+    <td class="${rateCellCls(tcrCls(tcrv,hasT))}" id="tcr-${id}">${hasT?pct(tcrv):'—'}</td>
+    <td class="${rateCellCls(gapCls(mcrGapVal(t,x+(st.wt||0))))}" id="gap-${id}">${gapTxt(mcrGapVal(t,x+(st.wt||0)))}</td>`;
 }
 
 function distTotRow(dk) {
@@ -520,7 +528,8 @@ function distTotRow(dk) {
     <td>${d.accy}</td><td>${d.tchart}</td>
     <td>${f(d.mcr,'mcr',d.traffic>0)}</td><td>${f(d.wtr,'wtr',d.traffic>0)}</td>
     <td>${f(d.fcr,'fcr',d.traffic>0)}</td><td>${f(d.apb,'apb',d.traffic>0,d.xm>0)}</td>
-    <td>${f(d.tcr,'tcr',d.traffic>0)}</td>`;
+    <td>${f(d.tcr,'tcr',d.traffic>0)}</td>
+    <td class="${rateCellCls(gapCls(mcrGapVal(d.traffic,d.xm+d.wt)))}">${gapTxt(mcrGapVal(d.traffic,d.xm+d.wt))}</td>`;
 }
 
 function setStore(name,field,val,dk) {
@@ -547,6 +556,9 @@ function refreshRow(name) {
     el.className=rateCellCls(status);
     el.textContent=hasT?(isApb?(hasX?dollar(v):'—'):pct(v)):'—';
   });
+  const gap=mcrGapVal(t,x+(st.wt||0));
+  const gel=document.getElementById('gap-'+id);
+  if(gel){ gel.className=rateCellCls(gapCls(gap)); gel.textContent=gapTxt(gap); }
   const nm=document.getElementById('nm-'+id); if(nm) nm.className='store-name-cell '+nameColor(name);
 }
 
