@@ -407,7 +407,18 @@ const TSHEET_NAME_MAP = {
   'Oak Ridge Xfinity Store':'Oak Ridge',
   'South Knoxville Xfinity Store':'South Knoxville',
   'North Knoxville Xfinity Store':'North Knoxville',
-  'Oak Lawn Xfinity Store':'Oak Lawn'
+  'Oak Lawn Xfinity Store':'Oak Lawn',
+  // Legacy / abbreviated INPUT spellings still found in older T-Sheet rows.
+  // Same set store-aliases.js v2 resolves. Keys are inputs; every value is a
+  // canonical SHORT name — never add an entry whose VALUE carries a suffix.
+  'Skokie':'South Skokie',
+  'S. Skokie':'South Skokie',
+  'S Skokie':'South Skokie',
+  'Knoxville':'South Knoxville',
+  'S. Knoxville':'South Knoxville',
+  'S Knoxville':'South Knoxville',
+  'N. Knoxville':'North Knoxville',
+  'N Knoxville':'North Knoxville'
 };
 
 function _tsheetTodayKey() {
