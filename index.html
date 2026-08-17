@@ -13,7 +13,7 @@
   --bad:#dc2626;  --bad-bg:#fef2f2;  --bad-bd:#fecaca;
   --wait:#d97706; --wait-bg:#fffbeb;
   --blue:#2563eb;
-  --north:#2563eb; --south:#7c3aed; --east:#0d9488; --bigsouth:#ea580c;
+  --north:#2563eb; --south:#7c3aed; --east:#0d9488; --west:#d97706; --bigsouth:#ea580c;
   --gold:#d97706; --silver:#64748b; --bronze:#b45309;
   --shadow:0 1px 3px rgba(17,24,39,.06),0 1px 2px rgba(17,24,39,.04);
   --shadow-lg:0 10px 30px rgba(17,24,39,.10);
@@ -58,6 +58,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-s
 .tab-btn[data-color="north"]{--tc:var(--north);}
 .tab-btn[data-color="south"]{--tc:var(--south);}
 .tab-btn[data-color="east"]{--tc:var(--east);}
+.tab-btn[data-color="west"]{--tc:var(--west);}
 .tab-btn[data-color="big"]{--tc:var(--bigsouth);}
 .tab-btn[data-color="recap"]{--tc:#0369a1;}
 .tab-btn[data-color="leaderboard"]{--tc:var(--gold);}
@@ -129,7 +130,7 @@ tbody td:first-child{text-align:left;padding-left:16px;font-weight:600;}
 .traffic-hero{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:18px 22px;margin-bottom:14px;background:linear-gradient(120deg,#1e293b,#334155);border-radius:var(--radius);color:#fff;box-shadow:var(--shadow-lg);}
 .traffic-hero .stat-label{color:#94a3b8;}
 .traffic-hero .big-num{font-family:'Space Grotesk',sans-serif;font-size:2.6rem;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;}
-.hero-minis{display:flex;gap:26px;flex-wrap:wrap;}
+.hero-minis{display:flex;gap:20px;flex-wrap:wrap;justify-content:flex-end;}
 .hero-mini{text-align:center;}
 .hero-mini .v{font-family:'Space Grotesk',sans-serif;font-size:1.45rem;font-weight:700;font-variant-numeric:tabular-nums;}
 .paste-card{padding:16px 18px;margin-bottom:14px;}
@@ -172,8 +173,8 @@ tbody td:first-child{text-align:left;padding-left:16px;font-weight:600;}
 .lb-bar-wrap{height:5px;background:var(--surface2);border-radius:3px;margin-top:6px;overflow:hidden;}
 .lb-bar{height:5px;border-radius:3px;}
 .lb-value{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;font-variant-numeric:tabular-nums;}
-.color-north{color:var(--north);} .color-south{color:var(--south);} .color-east{color:var(--east);} .color-big{color:var(--bigsouth);}
-.bg-north{background:var(--north);} .bg-south{background:var(--south);} .bg-east{background:var(--east);} .bg-big{background:var(--bigsouth);}
+.color-north{color:var(--north);} .color-south{color:var(--south);} .color-east{color:var(--east);} .color-west{color:var(--west);} .color-big{color:var(--bigsouth);}
+.bg-north{background:var(--north);} .bg-south{background:var(--south);} .bg-east{background:var(--east);} .bg-west{background:var(--west);} .bg-big{background:var(--bigsouth);}
 
 /* ============ TOAST ============ */
 .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--good);border-radius:10px;padding:12px 18px;font-size:.85rem;font-weight:600;box-shadow:var(--shadow-lg);z-index:9999;transform:translateY(110px);opacity:0;transition:all .3s;max-width:320px;}
@@ -206,6 +207,7 @@ tbody td:first-child{text-align:left;padding-left:16px;font-weight:600;}
 @media (max-width:640px){
   .traffic-hero .big-num{font-size:2rem;}
   .cel-card{padding:30px 26px;margin:0 16px;}
+  .hero-minis{gap:12px;justify-content:flex-start;}
 }
 </style>
 </head>
@@ -234,6 +236,7 @@ tbody td:first-child{text-align:left;padding-left:16px;font-weight:600;}
   <button class="tab-btn" data-tab="north" data-color="north" onclick="switchTab('north')">Chicago North</button>
   <button class="tab-btn" data-tab="south" data-color="south" onclick="switchTab('south')">Chicago South</button>
   <button class="tab-btn" data-tab="east" data-color="east" onclick="switchTab('east')">Chicago East</button>
+  <button class="tab-btn" data-tab="west" data-color="west" onclick="switchTab('west')">Chicago West</button>
   <button class="tab-btn" data-tab="bigsouth" data-color="big" onclick="switchTab('bigsouth')">The Big South</button>
   <button class="tab-btn" data-tab="recap" data-color="recap" onclick="switchTab('recap')">📊 Market Recap</button>
   <button class="tab-btn" data-tab="leaderboard" data-color="leaderboard" onclick="switchTab('leaderboard')">🏆 Leaderboard</button>
@@ -250,6 +253,7 @@ tbody td:first-child{text-align:left;padding-left:16px;font-weight:600;}
       <div class="hero-mini"><div class="stat-label" style="color:#93c5fd">Chi North</div><div class="v" id="tot-north">0</div></div>
       <div class="hero-mini"><div class="stat-label" style="color:#c4b5fd">Chi South</div><div class="v" id="tot-south">0</div></div>
       <div class="hero-mini"><div class="stat-label" style="color:#5eead4">Chi East</div><div class="v" id="tot-east">0</div></div>
+      <div class="hero-mini"><div class="stat-label" style="color:#fcd34d">Chi West</div><div class="v" id="tot-west">0</div></div>
       <div class="hero-mini"><div class="stat-label" style="color:#fdba74">Big South</div><div class="v" id="tot-big">0</div></div>
     </div>
   </div>
@@ -294,6 +298,15 @@ tbody td:first-child{text-align:left;padding-left:16px;font-weight:600;}
   <div class="table-wrap"><table id="east-table"></table></div>
 </div>
 
+<div id="tab-west" class="content">
+  <div class="dist-header">
+    <div class="dist-title"><span class="dist-dot" style="background:var(--west)"></span>Chicago West <span class="dist-sub">District —</span></div>
+    <button class="btn btn-danger" onclick="resetDistrict('west')">🔄 Reset</button>
+  </div>
+  <div class="stat-cards" id="west-stats"></div>
+  <div class="table-wrap"><table id="west-table"></table></div>
+</div>
+
 <div id="tab-bigsouth" class="content">
   <div class="dist-header">
     <div class="dist-title"><span class="dist-dot" style="background:var(--bigsouth)"></span>The Big South <span class="dist-sub">District 316</span></div>
@@ -310,9 +323,9 @@ tbody td:first-child{text-align:left;padding-left:16px;font-weight:600;}
   </div>
   <div class="section-label">Individual Districts</div>
   <div id="recap-districts"></div>
-  <div class="section-label">Chicago Market Total (North + South + East)</div>
+  <div class="section-label">Chicago Market Total (North + South + East + West)</div>
   <div id="recap-chicago"></div>
-  <div class="section-label">Full Region Grand Total — All 4 Districts</div>
+  <div class="section-label">Full Region Grand Total — All 5 Districts</div>
   <div id="recap-region"></div>
 </div>
 
@@ -336,11 +349,13 @@ tbody td:first-child{text-align:left;padding-left:16px;font-weight:600;}
 // DATA
 // ============================================================
 const DISTRICTS = {
-  north:    {label:'Chicago North', color:'north',    stores:['Evanston','Glenview','Kildeer','Uptown','South Skokie','Round Lake Beach','Machesney Park']},
-  south:    {label:'Chicago South', color:'south',    stores:['Evergreen Park','Tinley Park','Frankfort','Bourbonnais','Dekalb','Burbank','Calumet City']},
-  east:     {label:'Chicago East',  color:'east',     stores:['Cicero','Hammond','Valparaiso','Elkhart','South Bend','Schererville','Michigan City']},
-  bigsouth: {label:'Big South',     color:'big',      stores:['Oak Ridge','Greeneville','South Knoxville','Johnson City']}
+  north:    {label:'Chicago North', color:'north',    stores:['South Skokie','Evanston','Machesney Park','Uptown','Kildeer','Cicero']},
+  south:    {label:'Chicago South', color:'south',    stores:['Tinley Park','Frankfort','Bourbonnais','Evergreen Park','Oak Lawn']},
+  east:     {label:'Chicago East',  color:'east',     stores:['Elkhart','South Bend','Michigan City','Valparaiso','Schererville','Hammond']},
+  west:     {label:'Chicago West',  color:'west',     stores:['Calumet City','Glenview','Round Lake Beach','Burbank','Dekalb']},
+  bigsouth: {label:'Big South',     color:'big',      stores:['Oak Ridge','North Knoxville','South Knoxville','Johnson City','Greeneville']}
 };
+const DISTRICT_KEYS = ['north','south','east','west','bigsouth'];
 const ALL_STORES = [];
 Object.entries(DISTRICTS).forEach(([dk,d])=>d.stores.forEach(s=>ALL_STORES.push({name:s,district:dk})));
 
@@ -352,7 +367,9 @@ const STORE_ID_MAP = {
   '55005':'Frankfort','55006':'Elkhart','55008':'Evanston','55009':'Uptown',
   '55010':'Evergreen Park','55011':'Cicero','55027':'Bourbonnais',
   '51041':'Calumet City',
-  '51038':'Machesney Park'
+  '51038':'Machesney Park',
+  '51039':'Oak Lawn',
+  '51045':'North Knoxville'
 };
 
 // ============================================================
@@ -388,7 +405,9 @@ const TSHEET_NAME_MAP = {
   'Greeneville Xfinity Store':'Greeneville',
   'Johnson City Xfinity Store':'Johnson City',
   'Oak Ridge Xfinity Store':'Oak Ridge',
-  'South Knoxville Xfinity Store':'South Knoxville'
+  'South Knoxville Xfinity Store':'South Knoxville',
+  'North Knoxville Xfinity Store':'North Knoxville',
+  'Oak Lawn Xfinity Store':'Oak Lawn'
 };
 
 function _tsheetTodayKey() {
@@ -424,7 +443,7 @@ async function fetchTChartsFromTSheet(silent) {
         inp.value = v>0 ? v : '';
       }
     });
-    ['north','south','east','bigsouth'].forEach(dk=>refreshDistTable(dk));
+    DISTRICT_KEYS.forEach(dk=>refreshDistTable(dk));
     renderRecap(); renderLB();
     const indEl=document.getElementById('tsheet-status');
     if(indEl){
@@ -560,17 +579,18 @@ function parseEntry(val){
 
 function setTraffic(name,val) {
   state[name].traffic=parseEntry(val); save(); updateTotals();
-  ['north','south','east','bigsouth'].forEach(dk=>{refreshDistTable(dk);});
+  DISTRICT_KEYS.forEach(dk=>{refreshDistTable(dk);});
   renderRecap(); renderLB();
 }
 
 function updateTotals() {
-  let tot=0; const t={north:0,south:0,east:0,bigsouth:0};
+  let tot=0; const t={north:0,south:0,east:0,west:0,bigsouth:0};
   ALL_STORES.forEach(s=>{const v=num(state[s.name].traffic);tot+=v;t[s.district]+=v;});
   document.getElementById('total-traffic-display').textContent=tot.toLocaleString();
   document.getElementById('tot-north').textContent=t.north.toLocaleString();
   document.getElementById('tot-south').textContent=t.south.toLocaleString();
   document.getElementById('tot-east').textContent=t.east.toLocaleString();
+  document.getElementById('tot-west').textContent=t.west.toLocaleString();
   document.getElementById('tot-big').textContent=t.bigsouth.toLocaleString();
 }
 
@@ -853,15 +873,16 @@ function renderRecap() {
     {key:'north',name:'Chicago North',color:'var(--north)'},
     {key:'south',name:'Chicago South',color:'var(--south)'},
     {key:'east', name:'Chicago East', color:'var(--east)'},
+    {key:'west', name:'Chicago West', color:'var(--west)'},
     {key:'bigsouth',name:'The Big South',color:'var(--bigsouth)'}
   ];
   dEl.innerHTML=dists.map(({key,name,color})=>recapBlock(distTot(key),color,name)).join('');
 
-  const chi=combTot(['north','south','east']);
+  const chi=combTot(['north','south','east','west']);
   cEl.innerHTML=recapBlock(chi,'#0369a1','🌆 Chicago Market Combined',
     `Traffic: ${chi.traffic.toLocaleString()} · Mobile: ${chi.xm+chi.wt} · RGUs: ${chi.rgus}`);
 
-  const grand=combTot(['north','south','east','bigsouth']);
+  const grand=combTot(DISTRICT_KEYS);
   rEl.innerHTML=recapBlock(grand,'var(--gold)','🌎 Full Region Grand Total',
     `Traffic: ${grand.traffic.toLocaleString()} · Mobile: ${grand.xm+grand.wt} · RGUs: ${grand.rgus}`);
 }
@@ -922,7 +943,7 @@ function importPaste() {
   });
   save();
   buildTrafficGrid();
-  ['north','south','east','bigsouth'].forEach(dk=>{refreshDistTable(dk);});
+  DISTRICT_KEYS.forEach(dk=>{refreshDistTable(dk);});
   renderRecap(); renderLB();
   document.getElementById('paste-area').value='';
   showToast(`✅ Imported ${ok} stores${skip?` (${skip} skipped)`:''}`, 'success');
@@ -935,7 +956,7 @@ function resetAll() {
   ALL_STORES.forEach(s=>{state[s.name]=blankStore();}); save();
   celebMemo={};
   buildTrafficGrid();
-  ['north','south','east','bigsouth'].forEach(dk=>{buildDistTable(dk);renderStats(dk);});
+  DISTRICT_KEYS.forEach(dk=>{buildDistTable(dk);renderStats(dk);});
   renderRecap(); renderLB();
   showToast('🔄 All data reset!','danger');
 }
@@ -970,7 +991,7 @@ function eid(str){return str.replace(/[^a-zA-Z0-9]/g,'_');}
 
 function renderAll() {
   buildTrafficGrid();
-  ['north','south','east','bigsouth'].forEach(dk=>{buildDistTable(dk);renderStats(dk);});
+  DISTRICT_KEYS.forEach(dk=>{buildDistTable(dk);renderStats(dk);});
   renderRecap(); renderLB();
   // seed celebration memory so already-loaded data doesn't auto-fire on load
   ALL_STORES.forEach(s=>{
