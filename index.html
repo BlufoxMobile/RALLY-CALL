@@ -13,7 +13,7 @@
   --bad:#dc2626;  --bad-bg:#fef2f2;  --bad-bd:#fecaca;
   --wait:#d97706; --wait-bg:#fffbeb;
   --blue:#2563eb;
-  --north:#2563eb; --south:#7c3aed; --east:#0d9488; --west:#d97706; --bigsouth:#ea580c;
+  --north:#2563eb; --south:#7c3aed; --east:#0d9488; --west:#a16207; --bigsouth:#ea580c;
   --gold:#d97706; --silver:#64748b; --bronze:#b45309;
   --shadow:0 1px 3px rgba(17,24,39,.06),0 1px 2px rgba(17,24,39,.04);
   --shadow-lg:0 10px 30px rgba(17,24,39,.10);
@@ -253,7 +253,7 @@ tbody td:first-child{text-align:left;padding-left:16px;font-weight:600;}
       <div class="hero-mini"><div class="stat-label" style="color:#93c5fd">Chi North</div><div class="v" id="tot-north">0</div></div>
       <div class="hero-mini"><div class="stat-label" style="color:#c4b5fd">Chi South</div><div class="v" id="tot-south">0</div></div>
       <div class="hero-mini"><div class="stat-label" style="color:#5eead4">Chi East</div><div class="v" id="tot-east">0</div></div>
-      <div class="hero-mini"><div class="stat-label" style="color:#fcd34d">Chi West</div><div class="v" id="tot-west">0</div></div>
+      <div class="hero-mini"><div class="stat-label" style="color:#fde68a">Chi West</div><div class="v" id="tot-west">0</div></div>
       <div class="hero-mini"><div class="stat-label" style="color:#fdba74">Big South</div><div class="v" id="tot-big">0</div></div>
     </div>
   </div>
@@ -344,6 +344,8 @@ tbody td:first-child{text-align:left;padding-left:16px;font-weight:600;}
 <canvas id="fx-canvas"></canvas>
 <div class="cel-overlay" id="cel-overlay"><div class="cel-card" id="cel-card"></div></div>
 
+<!-- Shared store-name normalizer (single source of truth, other repo) -->
+<script src="https://blufoxmobile.github.io/Daily-Sales-Report/store-aliases.js"></script>
 <script>
 // ============================================================
 // DATA
@@ -421,6 +423,18 @@ const TSHEET_NAME_MAP = {
   'N Knoxville':'North Knoxville'
 };
 
+// Resolve a T-Sheet store label to RALLY-CALL's internal SHORT name.
+// Prefers the shared normalizer (store-aliases.js), which returns exactly the
+// canonical SHORT names this dashboard keys `state` on. isMyStore() gates it so
+// its cleaned passthrough for unknown labels can't invent a store; anything it
+// doesn't recognise falls through to TSHEET_NAME_MAP, which is also the whole
+// path when store-aliases.js failed to load.
+function tsheetStoreName(raw) {
+  const S = window.BLUFOX_STORES;
+  if (S && S.isMyStore(raw)) return S.normalizeStore(raw);
+  return TSHEET_NAME_MAP[raw] || raw;
+}
+
 function _tsheetTodayKey() {
   const d=new Date();
   const p=n=>String(n).padStart(2,'0');
@@ -442,7 +456,7 @@ async function fetchTChartsFromTSheet(silent) {
     let matched=0,unmatched=0;
     (data.submissions||[]).forEach(sub=>{
       if(!sub||_tsheetSubDayKey(sub)!==today) return;
-      const rallyName=TSHEET_NAME_MAP[sub.store]||sub.store;
+      const rallyName=tsheetStoreName(sub.store);
       if(state[rallyName]){ state[rallyName].tchart=(state[rallyName].tchart||0)+1; matched++; }
       else unmatched++;
     });
@@ -450,7 +464,7 @@ async function fetchTChartsFromTSheet(silent) {
     ALL_STORES.forEach(s=>{
       const inp=document.getElementById('tchart-inp-'+eid(s.name));
       if(inp){
-        const v=state[s.name].tchart||0;
+        const v=(state[s.name]&&state[s.name].tchart)||0;
         inp.value = v>0 ? v : '';
       }
     });
@@ -571,7 +585,7 @@ function buildTrafficGrid() {
   Object.entries(DISTRICTS).forEach(([dk,dist])=>{
     dist.stores.forEach(name=>{
       const c=document.createElement('div'); c.className='traffic-card';
-      c.style.setProperty('--sc',`var(--${dk==='bigsouth'?'bigsouth':dk})`);
+      c.style.setProperty('--sc',`var(--${dk})`);
       const v=state[name].traffic;
       c.innerHTML=`<div><div class="nm">${name}</div><div class="dl color-${dist.color}">${dist.label}</div></div>
         <input type="number" class="traffic-input" min="0" value="${entered(v)&&v>0?v:(v===0?'0':'')}" placeholder="0"
@@ -715,7 +729,7 @@ function refreshDistTable(dk) {
 }
 
 function renderStats(dk) {
-  const d=distTot(dk),c=`var(--${dk==='bigsouth'?'bigsouth':dk})`;
+  const d=distTot(dk),c=`var(--${dk})`;
   const el=document.getElementById(dk+'-stats'); if(!el)return;
   const card=(label,val)=>`<div class="stat-card" style="--card-color:${c}"><div class="stat-label">${label}</div><div class="stat-value">${val}</div></div>`;
   el.innerHTML=
@@ -889,7 +903,7 @@ function renderRecap() {
   ];
   dEl.innerHTML=dists.map(({key,name,color})=>recapBlock(distTot(key),color,name)).join('');
 
-  const chi=combTot(['north','south','east','west']);
+  const chi=combTot(DISTRICT_KEYS.filter(dk=>dk!=='bigsouth'));
   cEl.innerHTML=recapBlock(chi,'#0369a1','🌆 Chicago Market Combined',
     `Traffic: ${chi.traffic.toLocaleString()} · Mobile: ${chi.xm+chi.wt} · RGUs: ${chi.rgus}`);
 
